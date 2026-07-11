@@ -370,15 +370,45 @@
     </section>
 
     <section id="groceriesTab" class="tab-panel" data-tab="groceries">
-      <div class="page-heading">
+      <div class="page-heading grocery-page-heading">
         <div>
           <p class="eyebrow">Groceries</p>
-          <h1 id="groceryWeekHeading">Week 1 grocery list</h1>
-          <p class="muted">A practical preview based on this week's meals.</p>
+          <h1>Exact weekly grocery lists</h1>
+          <p class="muted">Calculated from the recipes, serving sizes, current substitutions, Fairlife routine, and selected maintenance calories.</p>
         </div>
       </div>
-      <section class="card">
-        <div id="groceryList" class="grocery-grid"></div>
+
+      <section class="grocery-preview-grid">
+        <div id="currentGroceryPreview"></div>
+        <div id="nextGroceryPreview"></div>
+      </section>
+
+      <section class="card grocery-browser-card">
+        <div class="section-head grocery-browser-heading">
+          <div>
+            <p class="eyebrow">Browse the plan</p>
+            <h2>Current, next, and future weeks</h2>
+          </div>
+          <span class="pill">Weeks 1–13</span>
+        </div>
+        <div id="groceryWeekSelector" class="grocery-week-selector" aria-label="Choose a grocery week"></div>
+      </section>
+
+      <section class="card grocery-selected-summary">
+        <div>
+          <p class="eyebrow">Selected list</p>
+          <h2 id="groceryWeekHeading">Week 1 exact grocery list</h2>
+          <p id="groceryWeekDates" class="muted"></p>
+        </div>
+        <div id="groceryWeekStats" class="grocery-week-stats"></div>
+      </section>
+
+      <div id="groceryFlexNotice" class="grocery-flex-notice hidden"></div>
+
+      <section id="groceryList" class="exact-grocery-grid" aria-live="polite"></section>
+
+      <section class="card grocery-method-note">
+        <p><strong>How quantities are calculated:</strong> every ingredient is multiplied by the scheduled serving size after substitutions. Discrete foods are rounded up only in the “buy at least” note. Rice and quinoa remain listed as cooked weights when the recipe uses cooked weight; pasta remains dry weight when the recipe specifies dry pasta. Unmeasured herbs and seasonings are listed as “as needed.”</p>
       </section>
     </section>
   </main>

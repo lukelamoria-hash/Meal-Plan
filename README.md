@@ -89,3 +89,16 @@ The 10:00 PM daily close is used because the scheduled dinner is at 7:30 PM.
 - Dashboard meals turn red as soon as their individual scheduled time has passed.
 - Checking an overdue meal immediately changes it from red to green.
 - Coffee and shake dashboard checkoffs retain their existing scheduled-time behavior.
+
+
+## Version 13: dynamic exact grocery lists
+
+- Grocery lists are generated from each week's effective meals and serving sizes.
+- Current meal substitutions immediately change the grocery quantities.
+- Fairlife shakes are counted as two bottles per planned day and coffee as one serving per day.
+- The grocery tab shows current week and next week preview cards.
+- Tabs provide access to all Weeks 1–13.
+- Quantified ingredients are consolidated by ingredient and measurement unit.
+- Discrete items show the exact fractional requirement plus a practical “buy at least” whole-item amount.
+- Flex-meal ingredients are excluded and clearly called out because the manually selected meal is unknown.
+- Cooked rice/quinoa and dry pasta retain the measurement state used in each recipe to avoid inaccurate conversion assumptions.

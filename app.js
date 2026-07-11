@@ -12,45 +12,6 @@ const PROGRAM = {
   cutCalorieSteps: [2000, 2000, 1900, 1900, 1800, 1800, 1700, 1700, 1650]
 };
 
-const groceries = {
-  Protein: [
-    "Chicken breast – 3 lb",
-    "Salmon – 1.5 lb",
-    "Cod – 1.5 lb",
-    "Lean turkey – 1 lb",
-    "Eggs – 18",
-    "Greek yogurt – 64 oz"
-  ],
-  Produce: [
-    "Apples – 7",
-    "Oranges – 4",
-    "Grapes – 1 bag",
-    "Spinach – 10 oz",
-    "Broccoli – 2 heads",
-    "Green beans – 1 lb",
-    "Tomatoes – 6",
-    "Cucumbers – 3",
-    "Lemons – 6"
-  ],
-  Carbs: [
-    "Old-fashioned oats – 18 oz",
-    "Jasmine rice – 2 lb",
-    "Baby potatoes – 3 lb",
-    "Whole wheat pitas – 8",
-    "Whole wheat pasta – 1 box"
-  ],
-  Pantry: [
-    "Olive oil",
-    "Almonds",
-    "Feta",
-    "Tzatziki",
-    "Garlic",
-    "Oregano",
-    "Paprika",
-    "Cinnamon"
-  ]
-};
-
 
 const CATEGORY_ICONS = {
   Breakfast: "☀",
@@ -230,6 +191,451 @@ function scaleIngredientLine(ingredient, portion) {
   return scaled;
 }
 
+
+function normalizeGroceryIngredientName(rawName, useApproximateWeight = false) {
+  let name = String(rawName || "").toLowerCase().trim();
+  name = name.replace(/\([^)]*\)/g, " ");
+  name = name.replace(/,\s*(halved|quartered|cubed|minced|sliced|diced|chopped|drained|peeled|mashed|grated|crumbled).*$/i, "");
+  name = name.replace(/\b(raw|diced|sliced|chopped|halved|quartered|cubed|minced|peeled|mashed|grated|crumbled|drained)\b/g, " ");
+  name = name.replace(/\s+/g, " ").trim();
+
+  if (useApproximateWeight) {
+    name = name.replace(/^(small|medium|large)\s+/, "");
+    name = name.replace(/^slices?\s+/, "");
+    name = name.replace(/\s+halves$/, "");
+  }
+
+  const replacements = [
+    [/^baby spinach$/, "spinach"],
+    [/^bell pepper$/, "bell peppers"],
+    [/^bell pepper halves$/, "bell peppers"],
+    [/^tomato$/, "tomatoes"],
+    [/^apple$/, "apples"],
+    [/^banana$/, "bananas"],
+    [/^grape$/, "grapes"],
+    [/^orange segments$/, "oranges"],
+    [/^pineapple chunks$/, "pineapple"],
+    [/^cucumber spears?$/, "cucumber"],
+    [/^carrot sticks$/, "carrots"],
+    [/^broccoli florets$/, "broccoli"],
+    [/^whole-grain toast$/, "whole-grain bread slices"],
+    [/^slice whole-grain toast$/, "whole-grain bread slices"],
+    [/^slices? whole-grain bread$/, "whole-grain bread"],
+    [/^large egg$/, "large eggs"],
+    [/^egg whites$/, "liquid egg whites"],
+    [/^garlic clove$/, "garlic cloves"],
+    [/^medium orange$/, "medium oranges"],
+    [/^whole-grain sandwich thin$/, "whole-grain sandwich thins"],
+    [/^crushed tomatoes$/, "canned crushed tomatoes"],
+    [/^jarred roasted red peppers$/, "roasted red peppers"],
+    [/^toasted oats$/, "old-fashioned oats"],
+    [/^rolled oats$/, "old-fashioned oats"],
+    [/^pepper$/, "black pepper"]
+  ];
+  replacements.forEach(([pattern, replacement]) => {
+    name = name.replace(pattern, replacement);
+  });
+
+  return name || "other ingredient";
+}
+
+function displayGroceryIngredientName(name) {
+  const text = String(name || "");
+  const displayed = text.charAt(0).toUpperCase() + text.slice(1);
+  return displayed
+    .replace(/\bgreek\b/gi, "Greek")
+    .replace(/\bfairlife\b/gi, "Fairlife")
+    .replace(/\bparmesan\b/gi, "Parmesan")
+    .replace(/\bbrussels\b/gi, "Brussels");
+}
+
+function normalizeGroceryMeasurement(quantity, unit) {
+  const value = Number(quantity);
+  const normalizedUnit = String(unit || "").toLowerCase();
+
+  if (normalizedUnit === "kg") return { amount: value * 1000, unit: "g" };
+  if (normalizedUnit === "oz") return { amount: value * 28.3495, unit: "g" };
+  if (normalizedUnit === "lb") return { amount: value * 453.592, unit: "g" };
+  if (normalizedUnit === "l") return { amount: value * 1000, unit: "ml" };
+  if (/^cups?$/.test(normalizedUnit)) return { amount: value * 240, unit: "ml" };
+  if (/^(tbsp|tablespoons?)$/.test(normalizedUnit)) return { amount: value * 3, unit: "tsp" };
+  if (/^(tsp|teaspoons?)$/.test(normalizedUnit)) return { amount: value, unit: "tsp" };
+  return { amount: value, unit: normalizedUnit };
+}
+
+function splitAsNeededIngredients(line) {
+  return String(line)
+    .replace(/^pinch of\s+/i, "")
+    .replace(/,\s*optional$/i, "")
+    .replace(/\band\b/gi, ",")
+    .split(",")
+    .map(item => item.trim())
+    .filter(Boolean)
+    .map(item => normalizeGroceryIngredientName(item));
+}
+
+function parseIngredientForGrocery(line, portion) {
+  const text = String(line || "").trim();
+  const quantityPattern = "(?:\\d+\\s+\\d+\\/\\d+|\\d+\\/\\d+|\\d+(?:\\.\\d+)?)";
+
+  const approximateMatch = text.match(
+    new RegExp(`^(${quantityPattern})\\s+(.+?),\\s*about\\s+(${quantityPattern})\\s*(g|kg|ml|l|oz|lb)$`, "i")
+  );
+  if (approximateMatch) {
+    const approximateQuantity = parseIngredientQuantity(approximateMatch[3]);
+    const measurement = normalizeGroceryMeasurement(approximateQuantity * portion, approximateMatch[4]);
+    return [{
+      name: normalizeGroceryIngredientName(approximateMatch[2], true),
+      amount: measurement.amount,
+      unit: measurement.unit,
+      discrete: false
+    }];
+  }
+
+  const measuredMatch = text.match(
+    new RegExp(`^(${quantityPattern})\\s*(g|kg|ml|l|oz|lb|tsp|tbsp|teaspoons?|tablespoons?|cups?)\\s+(.+)$`, "i")
+  );
+  if (measuredMatch) {
+    const quantity = parseIngredientQuantity(measuredMatch[1]);
+    const measurement = normalizeGroceryMeasurement(quantity * portion, measuredMatch[2]);
+    return [{
+      name: normalizeGroceryIngredientName(measuredMatch[3]),
+      amount: measurement.amount,
+      unit: measurement.unit,
+      discrete: false
+    }];
+  }
+
+  const countMatch = text.match(new RegExp(`^(${quantityPattern})\\s+(.+)$`, "i"));
+  if (countMatch) {
+    const quantity = parseIngredientQuantity(countMatch[1]);
+    return [{
+      name: normalizeGroceryIngredientName(countMatch[2]),
+      amount: quantity * portion,
+      unit: "count",
+      discrete: true
+    }];
+  }
+
+  return splitAsNeededIngredients(text).map(name => ({
+    name,
+    amount: 0,
+    unit: "as-needed",
+    discrete: false
+  }));
+}
+
+function groceryCategoryForIngredient(name) {
+  const value = String(name).toLowerCase();
+
+  if (/(broth|canned crushed tomatoes|tomato sauce|chickpea)/.test(value)) {
+    return "Pantry & seasonings";
+  }
+  if (/(chicken breast|chicken thighs|turkey|salmon|cod|shrimp|beef|egg|yogurt|feta|goat cheese|parmesan|milk|protein powder)/.test(value)) {
+    return "Protein & dairy";
+  }
+  if (/(rice|quinoa|pasta|orzo|oat|granola|bread|pita|tortilla|sandwich thin|breadcrumb|flour|potato|sweet potato)/.test(value)) {
+    return "Grains & starches";
+  }
+  if (/(olive oil|almond|walnut|pistachio|chia|hummus|tzatziki|olive|capers|honey|vinegar|dressing|lemon juice|vanilla extract)/.test(value)) {
+    return "Fats, nuts & condiments";
+  }
+  if (/(apple|banana|orange|grape|pineapple|peach|avocado|spinach|pepper|tomato|cucumber|broccoli|asparagus|green bean|brussels|carrot|mushroom|onion|garlic|romaine|greens|eggplant)/.test(value)) {
+    return "Produce";
+  }
+  return "Pantry & seasonings";
+}
+
+function addGroceryMeasurement(collection, record) {
+  if (!record || !record.name) return;
+  if (record.unit === "as-needed") {
+    collection.asNeeded.add(record.name);
+    return;
+  }
+
+  const key = `${record.name}|${record.unit}`;
+  const current = collection.exact.get(key) || {
+    name: record.name,
+    unit: record.unit,
+    amount: 0,
+    discrete: record.discrete
+  };
+  current.amount += Number(record.amount || 0);
+  current.discrete = current.discrete || record.discrete;
+  collection.exact.set(key, current);
+}
+
+function roundGroceryNumber(value, digits = 1) {
+  const factor = 10 ** digits;
+  return Math.round(Number(value) * factor) / factor;
+}
+
+function formatGroceryNumber(value, digits = 1) {
+  const rounded = roundGroceryNumber(value, digits);
+  return rounded.toLocaleString(undefined, {
+    maximumFractionDigits: digits,
+    minimumFractionDigits: Number.isInteger(rounded) ? 0 : 1
+  });
+}
+
+function formatGroceryAmount(item) {
+  const amount = Number(item.amount || 0);
+
+  if (item.unit === "g") {
+    const grams = formatGroceryNumber(amount, 1);
+    const ounces = formatGroceryNumber(amount / 28.3495, 2);
+    if (amount >= 1000) {
+      const kilograms = formatGroceryNumber(amount / 1000, 2);
+      const pounds = formatGroceryNumber(amount / 453.592, 2);
+      return `${grams} g · ${kilograms} kg / ${pounds} lb`;
+    }
+    return `${grams} g · ${ounces} oz`;
+  }
+
+  if (item.unit === "ml") {
+    const milliliters = formatGroceryNumber(amount, 1);
+    if (amount >= 1000) {
+      return `${milliliters} ml · ${formatGroceryNumber(amount / 1000, 2)} L`;
+    }
+    return `${milliliters} ml`;
+  }
+
+  if (item.unit === "tsp") {
+    const teaspoons = formatScaledQuantity(amount, "tsp");
+    if (amount >= 3) {
+      return `${teaspoons} tsp · ${formatScaledQuantity(amount / 3, "tbsp")} tbsp`;
+    }
+    return `${teaspoons} tsp`;
+  }
+
+  if (item.unit === "bottles") {
+    return `${formatGroceryNumber(amount, 0)} bottles`;
+  }
+
+  if (item.unit === "servings") {
+    return `${formatGroceryNumber(amount, 0)} servings`;
+  }
+
+  if (item.unit === "count") {
+    const exact = formatScaledQuantity(amount);
+    const roundedUp = Math.ceil(amount - 1e-9);
+    return Number.isInteger(roundGroceryNumber(amount, 2))
+      ? `${exact} needed`
+      : `${exact} needed · buy at least ${roundedUp}`;
+  }
+
+  return "As needed";
+}
+
+function buildGroceryWeek(weekNumber) {
+  const sourceDays = MEAL_PLAN.filter(day => day.week === Number(weekNumber));
+  const days = sourceDays.map(getEffectiveDay);
+  const collection = { exact: new Map(), asNeeded: new Set() };
+  const flexMeals = [];
+  let recipeMealCount = 0;
+
+  days.forEach(day => {
+    day.meals.forEach(meal => {
+      if (!meal.recipeId) {
+        flexMeals.push({ date: day.date, name: meal.name });
+        return;
+      }
+
+      const recipe = RECIPES.find(item => item.id === meal.recipeId);
+      if (!recipe) return;
+      recipeMealCount += 1;
+      recipe.ingredients.forEach(line => {
+        parseIngredientForGrocery(line, Number(meal.portion || 1))
+          .forEach(record => addGroceryMeasurement(collection, record));
+      });
+    });
+  });
+
+  const shake = fairlifeNutrition();
+  const routineItems = [
+    {
+      name: `Fairlife Nutrition Plan ${shake.label} shakes`,
+      amount: days.length * 2,
+      unit: "bottles",
+      category: "Daily routine"
+    },
+    {
+      name: "Black coffee",
+      amount: days.length,
+      unit: "servings",
+      category: "Daily routine"
+    }
+  ];
+
+  const exactNames = new Set([...collection.exact.values()].map(item => item.name));
+  const categories = new Map([
+    ["Daily routine", routineItems],
+    ["Protein & dairy", []],
+    ["Produce", []],
+    ["Grains & starches", []],
+    ["Fats, nuts & condiments", []],
+    ["Pantry & seasonings", []]
+  ]);
+
+  [...collection.exact.values()].forEach(item => {
+    const category = groceryCategoryForIngredient(item.name);
+    categories.get(category).push({
+      ...item,
+      category,
+      extraAsNeeded: collection.asNeeded.has(item.name)
+    });
+  });
+
+  [...collection.asNeeded]
+    .filter(name => !exactNames.has(name))
+    .forEach(name => {
+      categories.get("Pantry & seasonings").push({
+        name,
+        amount: 0,
+        unit: "as-needed",
+        category: "Pantry & seasonings",
+        extraAsNeeded: false
+      });
+    });
+
+  categories.forEach(items => {
+    items.sort((first, second) => first.name.localeCompare(second.name));
+  });
+
+  const first = days[0];
+  const last = days[days.length - 1];
+  return {
+    week: Number(weekNumber),
+    days,
+    firstDate: first ? first.date : "",
+    lastDate: last ? last.date : "",
+    categories,
+    flexMeals,
+    recipeMealCount,
+    shakeCount: days.length * 2,
+    exactItemCount: [...categories.values()].reduce((sum, items) => sum + items.length, 0)
+  };
+}
+
+function groceryCategoryMarkup(category, items) {
+  if (!items.length) return "";
+  return `
+    <article class="card exact-grocery-group">
+      <div class="exact-grocery-heading">
+        <h3>${category}</h3>
+        <span>${items.length} ${items.length === 1 ? "item" : "items"}</span>
+      </div>
+      <div class="exact-grocery-items">
+        ${items.map(item => `
+          <div class="exact-grocery-item">
+            <span>${displayGroceryIngredientName(item.name)}</span>
+            <strong>${formatGroceryAmount(item)}${item.extraAsNeeded ? " + extra as needed" : ""}</strong>
+          </div>
+        `).join("")}
+      </div>
+    </article>
+  `;
+}
+
+function groceryWeekPreviewMarkup(data, label, isNext = false) {
+  if (!data || !data.days.length) {
+    return `
+      <article class="card grocery-preview-card unavailable">
+        <p class="eyebrow">${label}</p>
+        <h2>Program complete</h2>
+        <p class="muted">There is no later grocery week in this 90-day plan.</p>
+      </article>
+    `;
+  }
+
+  return `
+    <article class="card grocery-preview-card ${isNext ? "next" : "current"}">
+      <div>
+        <p class="eyebrow">${label}</p>
+        <h2>Week ${data.week}</h2>
+        <p class="muted">${formatDate(data.firstDate, { month: "short", day: "numeric" })}–${formatDate(data.lastDate, { month: "short", day: "numeric", year: "numeric" })}</p>
+      </div>
+      <div class="grocery-preview-stats">
+        <span><strong>${data.days.length}</strong> days</span>
+        <span><strong>${data.recipeMealCount}</strong> recipe meals</span>
+        <span><strong>${data.shakeCount}</strong> shakes</span>
+      </div>
+      <button class="button ${isNext ? "ghost" : "primary"}" data-grocery-jump="${data.week}">View Week ${data.week}</button>
+    </article>
+  `;
+}
+
+function renderGroceryView(requestedWeek = activeGroceryWeek) {
+  const currentWeek = MEAL_PLAN[currentProgramDayIndex()].week;
+  const nextWeek = currentWeek < 13 ? currentWeek + 1 : null;
+  activeGroceryWeek = clamp(Number(requestedWeek) || currentWeek, 1, 13);
+
+  const currentData = buildGroceryWeek(currentWeek);
+  const nextData = nextWeek ? buildGroceryWeek(nextWeek) : null;
+  const selectedData = buildGroceryWeek(activeGroceryWeek);
+
+  const currentContainer = document.getElementById("currentGroceryPreview");
+  const nextContainer = document.getElementById("nextGroceryPreview");
+  const selector = document.getElementById("groceryWeekSelector");
+  const list = document.getElementById("groceryList");
+  if (!currentContainer || !nextContainer || !selector || !list) return;
+
+  currentContainer.innerHTML = groceryWeekPreviewMarkup(currentData, "Current week");
+  nextContainer.innerHTML = groceryWeekPreviewMarkup(nextData, "Next week", true);
+
+  selector.innerHTML = Array.from({ length: 13 }, (_, index) => {
+    const week = index + 1;
+    const classes = [
+      "grocery-week-button",
+      week === activeGroceryWeek ? "active" : "",
+      week === currentWeek ? "current" : "",
+      week === nextWeek ? "next" : ""
+    ].filter(Boolean).join(" ");
+    return `<button class="${classes}" data-grocery-week="${week}">Week ${week}${week === currentWeek ? " · Current" : week === nextWeek ? " · Next" : ""}</button>`;
+  }).join("");
+
+  document.getElementById("groceryWeekHeading").textContent = `Week ${selectedData.week} exact grocery list`;
+  document.getElementById("groceryWeekDates").textContent =
+    `${formatDate(selectedData.firstDate, { month: "long", day: "numeric" })}–${formatDate(selectedData.lastDate, { month: "long", day: "numeric", year: "numeric" })}`;
+
+  document.getElementById("groceryWeekStats").innerHTML = `
+    <div><span>Planned days</span><strong>${selectedData.days.length}</strong></div>
+    <div><span>Recipe meals</span><strong>${selectedData.recipeMealCount}</strong></div>
+    <div><span>Fairlife bottles</span><strong>${selectedData.shakeCount}</strong></div>
+    <div><span>List lines</span><strong>${selectedData.exactItemCount}</strong></div>
+  `;
+
+  list.innerHTML = [...selectedData.categories.entries()]
+    .map(([category, items]) => groceryCategoryMarkup(category, items))
+    .join("");
+
+  const flexNotice = document.getElementById("groceryFlexNotice");
+  if (selectedData.flexMeals.length) {
+    flexNotice.classList.remove("hidden");
+    flexNotice.innerHTML = `
+      <strong>Flex-meal note:</strong>
+      ${selectedData.flexMeals.map(item =>
+        `${formatDate(item.date, { weekday: "short", month: "short", day: "numeric" })} — ${item.name}`
+      ).join("; ")}.
+      Ingredients for manually entered flex meals are not included because the selected food is unknown.
+    `;
+  } else {
+    flexNotice.classList.add("hidden");
+    flexNotice.innerHTML = "";
+  }
+
+  document.querySelectorAll("[data-grocery-jump], [data-grocery-week]").forEach(button => {
+    button.addEventListener("click", () => renderGroceryView(
+      button.dataset.groceryJump || button.dataset.groceryWeek
+    ));
+  });
+}
+
+function bindGroceries() {
+  activeGroceryWeek = MEAL_PLAN[currentProgramDayIndex()].week;
+  renderGroceryView(activeGroceryWeek);
+}
+
 function openRecipe(recipeId, requestedPortion = 1) {
   const recipe = RECIPES.find(item => item.id === recipeId);
   if (!recipe) return;
@@ -304,6 +710,7 @@ function bindRecipeLibrary() {
 }
 
 let activePlanWeek = 1;
+let activeGroceryWeek = 1;
 
 function portionLabel(portion) {
   const labels = { "0.75": "¾ serving", "1": "1 serving", "1.25": "1¼ servings", "1.5": "1½ servings" };
@@ -768,6 +1175,7 @@ function removeMealSwap(date, slotIndex) {
 function refreshMealViews() {
   renderProgramDay();
   renderPlanWeek(activePlanWeek);
+  renderGroceryView(activeGroceryWeek);
 }
 
 function swapWindowLabel() {
@@ -1310,6 +1718,9 @@ function setActiveTab(tabName) {
   if (tabName === "meals") {
     requestAnimationFrame(renderRecipeLibrary);
   }
+  if (tabName === "groceries") {
+    requestAnimationFrame(() => renderGroceryView(activeGroceryWeek));
+  }
 }
 
 function updateClock() {
@@ -1412,21 +1823,6 @@ function renderProgramDay() {
     button.addEventListener("click", () => openSwapDialog(button.dataset.swapDate, Number(button.dataset.swapSlot)));
   });
 
-  const daysInWeek = MEAL_PLAN.filter(day => day.week === weekIndex + 1).length;
-  const weeklyGroceries = {
-    "Daily routine": [
-      `Fairlife Nutrition Plan shakes – ${daysInWeek * 2} bottles`,
-      "Black coffee – enough for the week"
-    ],
-    ...groceries
-  };
-  document.getElementById("groceryList").innerHTML = Object.entries(weeklyGroceries)
-    .map(([group, items]) => `
-      <div class="grocery-group">
-        <h3>${group}</h3>
-        <ul>${items.map(item => `<li>${item}</li>`).join("")}</ul>
-      </div>
-    `).join("");
 }
 
 function renderHabits() {
@@ -1744,6 +2140,7 @@ renderProgramDay();
 renderHabits();
 bindRecipeLibrary();
 bindPlan();
+bindGroceries();
 bindMealSwaps();
 bindNavigation();
 bindWeightForms();

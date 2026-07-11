@@ -859,3 +859,146 @@ body.modal-open{overflow:hidden}
     align-self:center;
   }
 }
+
+
+/* Version 13: dynamic exact weekly grocery lists */
+.grocery-page-heading{align-items:flex-start}
+.grocery-preview-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+  margin-bottom:14px;
+}
+.grocery-preview-card{
+  height:100%;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:18px;
+  align-items:start;
+}
+.grocery-preview-card>div:first-child{min-width:0}
+.grocery-preview-card .button{
+  grid-column:2;
+  grid-row:1/3;
+  align-self:center;
+}
+.grocery-preview-stats{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 16px;
+  color:var(--muted);
+  font-size:.8rem;
+}
+.grocery-preview-stats span{display:flex;gap:5px;align-items:baseline}
+.grocery-preview-stats strong{color:var(--ink)}
+.grocery-preview-card.current{border-color:rgba(46,107,80,.28)}
+.grocery-preview-card.next{background:#fbfaf5}
+.grocery-preview-card.unavailable{display:block}
+.grocery-browser-card{margin-bottom:14px}
+.grocery-browser-heading{margin-bottom:12px}
+.grocery-week-selector{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:2px 0 7px;
+  scrollbar-width:thin;
+}
+.grocery-week-button{
+  flex:0 0 auto;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:9px 13px;
+  background:white;
+  color:var(--muted);
+  font-size:.78rem;
+  font-weight:800;
+}
+.grocery-week-button.current{border-color:var(--green-2);color:var(--green)}
+.grocery-week-button.next{border-style:dashed}
+.grocery-week-button.active{background:var(--green);color:white;border-color:var(--green)}
+.grocery-selected-summary{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:24px;
+  align-items:center;
+  margin-bottom:14px;
+}
+.grocery-week-stats{
+  display:grid;
+  grid-template-columns:repeat(4,auto);
+  gap:10px;
+}
+.grocery-week-stats div{
+  min-width:92px;
+  border-left:1px solid var(--line);
+  padding-left:12px;
+}
+.grocery-week-stats span,
+.grocery-week-stats strong{display:block}
+.grocery-week-stats span{color:var(--muted);font-size:.72rem;margin-bottom:4px}
+.grocery-week-stats strong{font-size:1.05rem}
+.grocery-flex-notice{
+  border:1px solid #dfc98c;
+  background:#fff7de;
+  color:#68551f;
+  border-radius:15px;
+  padding:13px 15px;
+  margin-bottom:14px;
+  font-size:.85rem;
+  line-height:1.5;
+}
+.exact-grocery-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+  margin-bottom:14px;
+}
+.exact-grocery-group{padding:0;overflow:hidden}
+.exact-grocery-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:17px 19px;
+  background:#f2f6f2;
+  border-bottom:1px solid var(--line);
+}
+.exact-grocery-heading h3{margin:0;font-size:1rem}
+.exact-grocery-heading span{color:var(--muted);font-size:.75rem;font-weight:750}
+.exact-grocery-items{display:grid}
+.exact-grocery-item{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:16px;
+  align-items:center;
+  padding:12px 19px;
+  border-bottom:1px solid var(--line);
+}
+.exact-grocery-item:last-child{border-bottom:0}
+.exact-grocery-item span{font-weight:700}
+.exact-grocery-item strong{
+  color:var(--green-2);
+  font-size:.8rem;
+  text-align:right;
+  max-width:250px;
+}
+.grocery-method-note{font-size:.82rem;color:var(--muted)}
+.grocery-method-note p{margin:0;line-height:1.55}
+
+@media(max-width:900px){
+  .grocery-selected-summary{grid-template-columns:1fr}
+  .grocery-week-stats{grid-template-columns:repeat(4,1fr)}
+  .grocery-week-stats div{min-width:0}
+}
+@media(max-width:720px){
+  .grocery-preview-grid,
+  .exact-grocery-grid{grid-template-columns:1fr}
+  .grocery-preview-card{grid-template-columns:1fr}
+  .grocery-preview-card .button{grid-column:1;grid-row:auto;width:100%}
+  .grocery-week-stats{grid-template-columns:repeat(2,1fr)}
+  .exact-grocery-item{
+    grid-template-columns:1fr;
+    gap:5px;
+  }
+  .exact-grocery-item strong{text-align:left;max-width:none}
+}
