@@ -1,9 +1,10 @@
-const CACHE_NAME = "mediterranean-cut-v2";
+const CACHE_NAME = "mediterranean-cut-v3";
 const APP_FILES = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
+  "./recipes.js",
   "./manifest.json",
   "./icon.svg"
 ];

@@ -238,16 +238,40 @@
     </section>
 
     <section id="mealsTab" class="tab-panel" data-tab="meals">
-      <div class="page-heading">
+      <div class="page-heading library-heading">
         <div>
-          <p class="eyebrow">Meals</p>
-          <h1>Today's plan</h1>
-          <p class="muted">The full 45-meal library and 90-day calendar will be added next.</p>
+          <p class="eyebrow">Meal library</p>
+          <h1>50 Mediterranean-cut recipes</h1>
+          <p class="muted">15 breakfasts, 15 lunches, 15 dinners, and 5 snacks. Tap any meal for the full recipe.</p>
         </div>
+        <div class="library-total"><strong>50</strong><span>recipes</span></div>
       </div>
-      <section class="card">
-        <div id="fullMealList" class="meal-list"></div>
+
+      <section class="library-summary-grid" aria-label="Recipe totals">
+        <button class="card library-summary" data-category-shortcut="Breakfast"><span>Breakfast</span><strong>15</strong></button>
+        <button class="card library-summary" data-category-shortcut="Lunch"><span>Lunch</span><strong>15</strong></button>
+        <button class="card library-summary" data-category-shortcut="Dinner"><span>Dinner</span><strong>15</strong></button>
+        <button class="card library-summary" data-category-shortcut="Snack"><span>Snacks</span><strong>5</strong></button>
       </section>
+
+      <section class="card library-tools">
+        <label class="recipe-search-wrap" for="recipeSearch">
+          <span>Search</span>
+          <input id="recipeSearch" type="search" placeholder="Search chicken, pita, salmon, oats…" autocomplete="off" />
+        </label>
+        <div class="filter-row" role="group" aria-label="Filter recipes">
+          <button class="filter-chip active" data-recipe-filter="All">All</button>
+          <button class="filter-chip" data-recipe-filter="Breakfast">Breakfast</button>
+          <button class="filter-chip" data-recipe-filter="Lunch">Lunch</button>
+          <button class="filter-chip" data-recipe-filter="Dinner">Dinner</button>
+          <button class="filter-chip" data-recipe-filter="Snack">Snacks</button>
+        </div>
+        <p class="macro-note">Nutrition values are estimates per listed serving and may vary by brand and exact portion.</p>
+      </section>
+
+      <div id="recipeResultsSummary" class="results-summary"></div>
+      <section id="recipeGrid" class="recipe-grid" aria-live="polite"></section>
+      <div id="recipeEmpty" class="card recipe-empty hidden">No meals match that search. Try another ingredient or category.</div>
     </section>
 
     <section id="groceriesTab" class="tab-panel" data-tab="groceries">
@@ -264,6 +288,45 @@
     </section>
   </main>
 
+
+  <dialog id="recipeDialog" class="recipe-dialog">
+    <article class="recipe-modal">
+      <div class="recipe-modal-top">
+        <button id="closeRecipeDialog" class="modal-close" aria-label="Close recipe">×</button>
+        <p id="modalCategory" class="eyebrow"></p>
+        <h2 id="modalName"></h2>
+        <p id="modalDescription" class="muted"></p>
+      </div>
+
+      <div class="modal-macros" aria-label="Recipe nutrition">
+        <div><span>Calories</span><strong id="modalCalories"></strong></div>
+        <div><span>Protein</span><strong id="modalProtein"></strong></div>
+        <div><span>Carbs</span><strong id="modalCarbs"></strong></div>
+        <div><span>Fat</span><strong id="modalFat"></strong></div>
+        <div><span>Fiber</span><strong id="modalFiber"></strong></div>
+      </div>
+
+      <div class="recipe-meta-row">
+        <span><strong id="modalServings"></strong> serving</span>
+        <span><strong id="modalPrep"></strong> prep</span>
+        <span><strong id="modalCook"></strong> cook</span>
+      </div>
+
+      <div class="recipe-detail-grid">
+        <section>
+          <h3>Ingredients</h3>
+          <ul id="modalIngredients" class="ingredient-list"></ul>
+        </section>
+        <section>
+          <h3>Step-by-step</h3>
+          <ol id="modalSteps" class="step-list"></ol>
+        </section>
+      </div>
+
+      <p class="modal-disclaimer">Macros are planning estimates. For the closest numbers, weigh ingredients and use the nutrition labels on the brands you buy.</p>
+    </article>
+  </dialog>
+
   <nav class="mobile-nav" aria-label="Mobile navigation">
     <button class="active" data-tab-link="dashboard"><span>⌂</span>Dashboard</button>
     <button data-tab-link="progress"><span>↗</span>Progress</button>
@@ -271,6 +334,7 @@
     <button data-tab-link="groceries"><span>✓</span>Groceries</button>
   </nav>
 
+  <script src="recipes.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

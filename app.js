@@ -20,27 +20,6 @@ const PROGRAM = {
   ]
 };
 
-const mealRotation = [
-  [
-    { type: "Breakfast", name: "Apple Cinnamon Protein Oats", cal: 470, protein: 40 },
-    { type: "Lunch", name: "Lemon Garlic Chicken Bowl", cal: 610, protein: 55 },
-    { type: "Snack", name: "Greek Yogurt, Apple & Almonds", cal: 310, protein: 28 },
-    { type: "Dinner", name: "Herb Salmon with Roasted Potatoes", cal: 710, protein: 62 }
-  ],
-  [
-    { type: "Breakfast", name: "Spinach Feta Egg Pita", cal: 480, protein: 38 },
-    { type: "Lunch", name: "Chicken Shawarma Pita", cal: 590, protein: 52 },
-    { type: "Snack", name: "Protein Shake & Orange", cal: 280, protein: 32 },
-    { type: "Dinner", name: "Garlic Cod with Rice and Green Beans", cal: 750, protein: 63 }
-  ],
-  [
-    { type: "Breakfast", name: "Greek Yogurt Granola Bowl", cal: 460, protein: 42 },
-    { type: "Lunch", name: "Turkey Kofta Rice Bowl", cal: 620, protein: 54 },
-    { type: "Snack", name: "Hard-Boiled Eggs & Grapes", cal: 290, protein: 22 },
-    { type: "Dinner", name: "Mediterranean Chicken Pasta", cal: 730, protein: 67 }
-  ]
-];
-
 const groceries = {
   Protein: [
     "Chicken breast – 3 lb",
@@ -79,6 +58,154 @@ const groceries = {
     "Cinnamon"
   ]
 };
+
+
+const CATEGORY_ICONS = {
+  Breakfast: "☀",
+  Lunch: "◐",
+  Dinner: "☾",
+  Snack: "◇"
+};
+
+let activeRecipeFilter = "All";
+let recipeSearchTerm = "";
+
+function getRecipesByCategory(category) {
+  return RECIPES.filter(recipe => recipe.category === category);
+}
+
+function getDailyRecipes(dayIndex) {
+  const breakfasts = getRecipesByCategory("Breakfast");
+  const lunches = getRecipesByCategory("Lunch");
+  const dinners = getRecipesByCategory("Dinner");
+  const snacks = getRecipesByCategory("Snack");
+  return [
+    breakfasts[dayIndex % breakfasts.length],
+    lunches[(dayIndex * 2 + Math.floor(dayIndex / 7)) % lunches.length],
+    snacks[(dayIndex + Math.floor(dayIndex / 5)) % snacks.length],
+    dinners[(dayIndex * 3 + Math.floor(dayIndex / 7)) % dinners.length]
+  ];
+}
+
+function recipeSearchText(recipe) {
+  return [
+    recipe.name,
+    recipe.category,
+    recipe.description,
+    ...(recipe.tags || []),
+    ...recipe.ingredients
+  ].join(" ").toLowerCase();
+}
+
+function recipeCardMarkup(recipe) {
+  return `
+    <article class="card recipe-card" data-category="${recipe.category}">
+      <div class="recipe-card-hero">
+        <div>
+          <div class="recipe-category-label">${recipe.category}</div>
+        </div>
+        <div class="recipe-card-icon" aria-hidden="true">${CATEGORY_ICONS[recipe.category]}</div>
+      </div>
+      <div class="recipe-card-body">
+        <h3>${recipe.name}</h3>
+        <p class="recipe-card-description">${recipe.description}</p>
+        <div class="recipe-card-macros">
+          <div><span>Calories</span><strong>${recipe.calories}</strong></div>
+          <div><span>Protein</span><strong>${recipe.protein}g</strong></div>
+          <div><span>Fiber</span><strong>${recipe.fiber}g</strong></div>
+        </div>
+        <button class="recipe-open" data-open-recipe="${recipe.id}">View recipe</button>
+      </div>
+    </article>
+  `;
+}
+
+function renderRecipeLibrary() {
+  const term = recipeSearchTerm.trim().toLowerCase();
+  const filtered = RECIPES.filter(recipe => {
+    const categoryMatches = activeRecipeFilter === "All" || recipe.category === activeRecipeFilter;
+    const searchMatches = !term || recipeSearchText(recipe).includes(term);
+    return categoryMatches && searchMatches;
+  });
+
+  document.getElementById("recipeGrid").innerHTML = filtered.map(recipeCardMarkup).join("");
+  document.getElementById("recipeEmpty").classList.toggle("hidden", filtered.length !== 0);
+  document.getElementById("recipeResultsSummary").textContent =
+    `${filtered.length} ${filtered.length === 1 ? "recipe" : "recipes"}${activeRecipeFilter === "All" ? "" : ` in ${activeRecipeFilter}`}`;
+
+  document.querySelectorAll("[data-open-recipe]").forEach(button => {
+    button.addEventListener("click", () => openRecipe(button.dataset.openRecipe));
+  });
+}
+
+function setRecipeFilter(category) {
+  activeRecipeFilter = category;
+  document.querySelectorAll("[data-recipe-filter]").forEach(button => {
+    button.classList.toggle("active", button.dataset.recipeFilter === category);
+  });
+  renderRecipeLibrary();
+}
+
+function openRecipe(recipeId) {
+  const recipe = RECIPES.find(item => item.id === recipeId);
+  if (!recipe) return;
+
+  document.getElementById("modalCategory").textContent = recipe.category;
+  document.getElementById("modalName").textContent = recipe.name;
+  document.getElementById("modalDescription").textContent = recipe.description;
+  document.getElementById("modalCalories").textContent = recipe.calories;
+  document.getElementById("modalProtein").textContent = `${recipe.protein}g`;
+  document.getElementById("modalCarbs").textContent = `${recipe.carbs}g`;
+  document.getElementById("modalFat").textContent = `${recipe.fat}g`;
+  document.getElementById("modalFiber").textContent = `${recipe.fiber}g`;
+  document.getElementById("modalServings").textContent = recipe.servings;
+  document.getElementById("modalPrep").textContent = recipe.prep;
+  document.getElementById("modalCook").textContent = recipe.cook;
+  document.getElementById("modalIngredients").innerHTML = recipe.ingredients.map(item => `<li>${item}</li>`).join("");
+  document.getElementById("modalSteps").innerHTML = recipe.steps.map(step => `<li>${step}</li>`).join("");
+
+  const dialog = document.getElementById("recipeDialog");
+  document.body.classList.add("modal-open");
+  if (typeof dialog.showModal === "function") dialog.showModal();
+  else dialog.setAttribute("open", "");
+}
+
+function closeRecipe() {
+  const dialog = document.getElementById("recipeDialog");
+  document.body.classList.remove("modal-open");
+  if (typeof dialog.close === "function" && dialog.open) dialog.close();
+  else dialog.removeAttribute("open");
+}
+
+function bindRecipeLibrary() {
+  const search = document.getElementById("recipeSearch");
+  search.addEventListener("input", () => {
+    recipeSearchTerm = search.value;
+    renderRecipeLibrary();
+  });
+
+  document.querySelectorAll("[data-recipe-filter]").forEach(button => {
+    button.addEventListener("click", () => setRecipeFilter(button.dataset.recipeFilter));
+  });
+
+  document.querySelectorAll("[data-category-shortcut]").forEach(button => {
+    button.addEventListener("click", () => {
+      setRecipeFilter(button.dataset.categoryShortcut);
+      document.getElementById("recipeGrid").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+
+  document.getElementById("closeRecipeDialog").addEventListener("click", closeRecipe);
+  document.getElementById("recipeDialog").addEventListener("click", event => {
+    if (event.target === event.currentTarget) closeRecipe();
+  });
+  document.getElementById("recipeDialog").addEventListener("cancel", event => {
+    event.preventDefault();
+    closeRecipe();
+  });
+
+  renderRecipeLibrary();
+}
 
 const WEIGHT_STORAGE_KEY = "med-cut-weight-entries-v2";
 
@@ -173,6 +300,9 @@ function setActiveTab(tabName) {
   if (tabName === "progress") {
     requestAnimationFrame(renderProgress);
   }
+  if (tabName === "meals") {
+    requestAnimationFrame(renderRecipeLibrary);
+  }
 }
 
 function updateClock() {
@@ -217,17 +347,27 @@ function renderProgramDay() {
   document.getElementById("proteinTargetSmall").textContent = `${target.protein}g protein`;
   document.getElementById("groceryWeekHeading").textContent = `Week ${weekIndex + 1} grocery list`;
 
-  const meals = mealRotation[dayIndex % mealRotation.length];
+  const meals = getDailyRecipes(dayIndex);
   const mealMarkup = meals.map(meal => `
-    <div class="meal">
-      <div class="meal-type">${meal.type}</div>
-      <div class="meal-name">${meal.name}</div>
-      <div class="meal-macros">${meal.cal} cal · ${meal.protein}g protein</div>
+    <div class="meal recipe-clickable" data-open-recipe="${meal.id}" tabindex="0" role="button" aria-label="Open ${meal.name} recipe">
+      <div class="meal-type">${meal.category}</div>
+      <button class="meal-name-button" data-open-recipe="${meal.id}">${meal.name}</button>
+      <div class="meal-macros">${meal.calories} cal · ${meal.protein}g protein</div>
     </div>
   `).join("");
 
   document.getElementById("mealList").innerHTML = mealMarkup;
-  document.getElementById("fullMealList").innerHTML = mealMarkup;
+  document.querySelectorAll("#mealList [data-open-recipe]").forEach(element => {
+    element.addEventListener("click", event => {
+      event.stopPropagation();
+      openRecipe(element.dataset.openRecipe);
+    });
+    if (element.classList.contains("meal")) {
+      element.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") openRecipe(element.dataset.openRecipe);
+      });
+    }
+  });
 
   document.getElementById("groceryList").innerHTML = Object.entries(groceries)
     .map(([group, items]) => `
@@ -548,6 +688,7 @@ function registerServiceWorker() {
 
 renderProgramDay();
 renderHabits();
+bindRecipeLibrary();
 bindNavigation();
 bindWeightForms();
 bindInstall();

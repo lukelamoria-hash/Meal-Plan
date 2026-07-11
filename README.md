@@ -1,28 +1,27 @@
-# Mediterranean 90-Day Cut App
+# Mediterranean 90-Day Cut App — Recipe Library Update
 
-Version 2 adds:
+This version includes the earlier dashboard, live date/time, progress graph, and offline support, plus a complete recipe library.
 
-- A dedicated Progress tab
-- A responsive weight progress graph
-- Actual weight versus planned target trend
-- Add, replace, and delete daily weigh-ins
-- Latest weight, total lost, remaining, and seven-day average
-- A live date-and-time card on the dashboard
-- A mini progress chart on the dashboard
-- Migration of weigh-ins saved by the first app version
-- Offline/installable PWA support
+## New in this version
 
-## Deploy through GitHub and Vercel
+- 50 recipes total
+- 15 breakfasts
+- 15 lunches
+- 15 dinners
+- 5 snacks
+- Search by meal name or ingredient
+- Filter by meal type
+- Click any recipe to open ingredients and step-by-step cooking directions
+- Calories, protein, carbohydrates, fat, and fiber for every recipe
+- Prep time, cook time, and serving information
+- Dashboard meals now open the matching recipe
 
-1. Download and unzip the package.
-2. In the GitHub repository, choose **Add file → Upload files**.
-3. Upload all files from the unzipped folder to the repository root.
-4. Choose **Commit changes**.
-5. Vercel should deploy the update automatically.
+Nutrition values are estimates per listed serving. Brand labels and exact ingredient weights can change the final totals.
 
-This is a static application. No build command or environment variables are required.
+## Upload to GitHub
 
-## Storage note
+Upload every file in this package to the root of your repository and choose **Commit changes**. Existing files with the same names should be replaced. Vercel should redeploy automatically.
 
-Weigh-ins and habit checkboxes are stored in the browser using `localStorage`.
-They remain available offline on that device. They do not yet sync between different phones or browsers.
+## Local storage
+
+Weight entries and habit checkboxes remain saved in the browser on that device and work offline. They do not yet sync across devices.
