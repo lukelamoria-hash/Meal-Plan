@@ -4,85 +4,271 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#173a2c" />
+  <meta name="description" content="A personal 90-day Mediterranean meal plan and progress tracker." />
   <title>Mediterranean 90-Day Cut</title>
   <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="topbar">
-    <div>
-      <p class="eyebrow">Mediterranean 90-Day Cut</p>
-      <h1>Today</h1>
-      <p id="dateLabel" class="muted"></p>
+    <a class="brand" href="#" data-tab-link="dashboard" aria-label="Open dashboard">
+      <span class="brand-mark">M</span>
+      <span>
+        <span class="brand-title">Mediterranean Cut</span>
+        <span class="brand-subtitle">90-day plan</span>
+      </span>
+    </a>
+
+    <div class="header-actions">
+      <button id="installBtn" class="button ghost hidden">Install app</button>
+      <button id="mobileMenuBtn" class="menu-button" aria-label="Open navigation">☰</button>
     </div>
-    <button id="installBtn" class="secondary hidden">Install app</button>
   </header>
 
+  <nav id="desktopNav" class="desktop-nav" aria-label="Main navigation">
+    <button class="nav-link active" data-tab-link="dashboard">Dashboard</button>
+    <button class="nav-link" data-tab-link="progress">Progress</button>
+    <button class="nav-link" data-tab-link="meals">Meals</button>
+    <button class="nav-link" data-tab-link="groceries">Groceries</button>
+  </nav>
+
   <main class="container">
-    <section class="card hero">
-      <div>
-        <p class="eyebrow">Your timeline</p>
-        <h2 id="dayLabel">Day 1 of 90</h2>
-        <p id="weekLabel" class="muted">Week 1</p>
+    <section id="dashboardTab" class="tab-panel active" data-tab="dashboard">
+      <div class="dashboard-heading">
+        <div>
+          <p class="eyebrow">Daily briefing</p>
+          <h1 id="greeting">Good morning, Luke</h1>
+          <p class="muted">Here is your plan for today.</p>
+        </div>
+
+        <article class="clock-card" aria-live="polite">
+          <span id="liveDate" class="clock-date"></span>
+          <strong id="liveTime" class="clock-time"></strong>
+          <span class="clock-zone">Local time</span>
+        </article>
       </div>
-      <div>
-        <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
-        <p id="daysRemaining" class="muted small"></p>
-      </div>
-    </section>
 
-    <section class="stats-grid">
-      <article class="card stat"><span>Starting weight</span><strong>178 lb</strong></article>
-      <article class="card stat"><span>Goal weight</span><strong>155 lb</strong></article>
-      <article class="card stat"><span>Today's target range</span><strong id="targetWeight"></strong></article>
-      <article class="card stat"><span>Calories</span><strong id="calorieTarget"></strong></article>
-    </section>
-
-    <section class="main-grid">
-      <article class="card">
-        <div class="section-head">
-          <div><p class="eyebrow">Today</p><h2>Meal plan</h2></div>
-          <span id="proteinTarget" class="pill"></span>
+      <section class="card timeline-card">
+        <div>
+          <p class="eyebrow">Your timeline</p>
+          <h2 id="dayLabel">Day 1 of 90</h2>
+          <p id="weekLabel" class="muted">Week 1</p>
         </div>
-        <div id="mealList"></div>
-      </article>
-
-      <article class="card">
-        <div class="section-head">
-          <div><p class="eyebrow">Daily check-in</p><h2>Stay on track</h2></div>
-        </div>
-        <div class="check-list">
-          <label><input type="checkbox" data-habit="calories"> Hit calorie target</label>
-          <label><input type="checkbox" data-habit="protein"> Hit protein target</label>
-          <label><input type="checkbox" data-habit="water"> Drink 100+ oz water</label>
-          <label><input type="checkbox" data-habit="workout"> Complete workout</label>
-          <label><input type="checkbox" data-habit="steps"> Hit step goal</label>
-        </div>
-        <div class="weight-box">
-          <label for="weightInput">Today's weight</label>
-          <div class="input-row">
-            <input id="weightInput" type="number" step="0.1" placeholder="178.0" />
-            <button id="saveWeight">Save</button>
+        <div class="timeline-progress">
+          <div class="progress-track" aria-label="Program progress">
+            <div id="progressFill" class="progress-fill"></div>
           </div>
-          <p id="weightMessage" class="muted small"></p>
+          <div class="progress-copy">
+            <span id="progressPercent">1% complete</span>
+            <span id="daysRemaining">89 days remaining</span>
+          </div>
         </div>
-      </article>
+      </section>
+
+      <section class="stats-grid">
+        <article class="card stat">
+          <span>Starting weight</span>
+          <strong>178 lb</strong>
+          <small>July 11, 2026</small>
+        </article>
+        <article class="card stat">
+          <span>Latest weight</span>
+          <strong id="dashboardLatestWeight">—</strong>
+          <small id="dashboardLatestDate">Log your first weigh-in</small>
+        </article>
+        <article class="card stat">
+          <span>Today's target range</span>
+          <strong id="targetWeight">—</strong>
+          <small>Trend guide, not a pass/fail score</small>
+        </article>
+        <article class="card stat">
+          <span>Today's calories</span>
+          <strong id="calorieTarget">—</strong>
+          <small id="proteinTargetSmall">— protein</small>
+        </article>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Today</p>
+              <h2>Meal plan</h2>
+            </div>
+            <span id="proteinTarget" class="pill"></span>
+          </div>
+          <div id="mealList" class="meal-list"></div>
+          <button class="text-button" data-tab-link="meals">View the meal plan →</button>
+        </article>
+
+        <article class="card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Daily check-in</p>
+              <h2>Stay on track</h2>
+            </div>
+          </div>
+
+          <div class="check-list">
+            <label><input type="checkbox" data-habit="calories" /> Hit calorie target</label>
+            <label><input type="checkbox" data-habit="protein" /> Hit protein target</label>
+            <label><input type="checkbox" data-habit="water" /> Drink 100+ oz water</label>
+            <label><input type="checkbox" data-habit="workout" /> Complete workout</label>
+            <label><input type="checkbox" data-habit="steps" /> Hit step goal</label>
+          </div>
+
+          <div class="weight-box">
+            <label for="dashboardWeightInput">Today's weight</label>
+            <div class="input-row">
+              <input id="dashboardWeightInput" type="number" min="80" max="400" step="0.1" placeholder="178.0" />
+              <button id="dashboardSaveWeight" class="button primary">Save</button>
+            </div>
+            <p id="dashboardWeightMessage" class="form-message" aria-live="polite"></p>
+          </div>
+        </article>
+      </section>
+
+      <section class="card dashboard-progress-card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Weight progress</p>
+            <h2>Your recent trend</h2>
+          </div>
+          <button class="button ghost" data-tab-link="progress">Open progress tab</button>
+        </div>
+        <div class="mini-progress-layout">
+          <div>
+            <strong id="dashboardPoundsLost" class="big-number">0.0</strong>
+            <span class="big-number-label">pounds lost</span>
+          </div>
+          <div class="mini-chart-wrap">
+            <canvas id="miniWeightChart" aria-label="Recent weight progress graph"></canvas>
+            <div id="miniChartEmpty" class="empty-overlay">Log at least two weigh-ins to see your trend.</div>
+          </div>
+        </div>
+      </section>
     </section>
 
-    <section class="card">
-      <div class="section-head">
-        <div><p class="eyebrow">This week</p><h2>Grocery list</h2></div>
-        <button id="groceryToggle" class="secondary">Show list</button>
+    <section id="progressTab" class="tab-panel" data-tab="progress">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">Progress</p>
+          <h1>Weight tracker</h1>
+          <p class="muted">Daily changes are noisy. The overall trend is what matters.</p>
+        </div>
       </div>
-      <div id="groceryList" class="grocery-grid hidden"></div>
+
+      <section class="progress-stats-grid">
+        <article class="card stat">
+          <span>Latest weight</span>
+          <strong id="progressLatestWeight">—</strong>
+          <small id="progressLatestDate">No entries yet</small>
+        </article>
+        <article class="card stat">
+          <span>Total lost</span>
+          <strong id="totalLost">0.0 lb</strong>
+          <small>From 178 lb</small>
+        </article>
+        <article class="card stat">
+          <span>Remaining</span>
+          <strong id="remainingWeight">23.0 lb</strong>
+          <small>Goal: 155 lb</small>
+        </article>
+        <article class="card stat">
+          <span>7-day average</span>
+          <strong id="sevenDayAverage">—</strong>
+          <small>Smooths daily fluctuations</small>
+        </article>
+      </section>
+
+      <section class="card chart-card">
+        <div class="section-head chart-heading">
+          <div>
+            <p class="eyebrow">Trend graph</p>
+            <h2>Actual weight vs. target</h2>
+          </div>
+          <div class="chart-legend" aria-label="Chart legend">
+            <span><i class="legend-dot actual"></i>Actual</span>
+            <span><i class="legend-dot target"></i>Target</span>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="weightChart" aria-label="Weight progress graph"></canvas>
+          <div id="chartEmpty" class="empty-overlay">
+            Add your first weigh-in below. Two or more entries will create your progress line.
+          </div>
+        </div>
+      </section>
+
+      <section class="progress-lower-grid">
+        <article class="card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Add entry</p>
+              <h2>Log a weigh-in</h2>
+            </div>
+          </div>
+
+          <form id="weightForm" class="weight-form">
+            <label>
+              Date
+              <input id="entryDate" type="date" required />
+            </label>
+            <label>
+              Weight (lb)
+              <input id="entryWeight" type="number" min="80" max="400" step="0.1" placeholder="178.0" required />
+            </label>
+            <button type="submit" class="button primary">Save weigh-in</button>
+          </form>
+          <p id="progressFormMessage" class="form-message" aria-live="polite"></p>
+        </article>
+
+        <article class="card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">History</p>
+              <h2>Recent weigh-ins</h2>
+            </div>
+            <button id="clearWeights" class="text-button danger">Clear all</button>
+          </div>
+          <div id="weightHistory" class="weight-history"></div>
+        </article>
+      </section>
+    </section>
+
+    <section id="mealsTab" class="tab-panel" data-tab="meals">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">Meals</p>
+          <h1>Today's plan</h1>
+          <p class="muted">The full 45-meal library and 90-day calendar will be added next.</p>
+        </div>
+      </div>
+      <section class="card">
+        <div id="fullMealList" class="meal-list"></div>
+      </section>
+    </section>
+
+    <section id="groceriesTab" class="tab-panel" data-tab="groceries">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">Groceries</p>
+          <h1 id="groceryWeekHeading">Week 1 grocery list</h1>
+          <p class="muted">A practical preview based on this week's meals.</p>
+        </div>
+      </div>
+      <section class="card">
+        <div id="groceryList" class="grocery-grid"></div>
+      </section>
     </section>
   </main>
 
-  <nav class="bottom-nav">
-    <a href="#">Dashboard</a>
-    <a href="#mealList">Meals</a>
-    <a href="#groceryList">Groceries</a>
-    <a href="#weightInput">Progress</a>
+  <nav class="mobile-nav" aria-label="Mobile navigation">
+    <button class="active" data-tab-link="dashboard"><span>⌂</span>Dashboard</button>
+    <button data-tab-link="progress"><span>↗</span>Progress</button>
+    <button data-tab-link="meals"><span>◉</span>Meals</button>
+    <button data-tab-link="groceries"><span>✓</span>Groceries</button>
   </nav>
 
   <script src="app.js"></script>

@@ -3,7 +3,15 @@
   "short_name": "Meal Plan",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f4f0e7",
+  "background_color": "#f3f0e8",
   "theme_color": "#173a2c",
-  "description": "Personal 90-day Mediterranean meal-plan and progress app."
+  "description": "A personal 90-day Mediterranean meal plan and weight progress tracker.",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }
