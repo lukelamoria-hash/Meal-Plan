@@ -45,3 +45,15 @@ Weight entries, swaps, habits, shake flavor, and the maintenance-calorie setting
 - Ingredient quantities, embedded gram measurements, step measurements, calories, and macros scale automatically.
 - Common portions display as practical fractions such as ¾, 1¼, and 1½ servings.
 - Recipe-library cards still open at the base one-serving recipe.
+
+
+## Version 9: meal completion checkboxes
+
+- Every dashboard meal has its own completion checkbox.
+- Completed meals turn green immediately.
+- Unchecked meals remain neutral during the day.
+- At 10:00 PM local time, unchecked meals turn red and are counted as missed.
+- Completion is saved by date and meal slot in the browser, including offline.
+- Meal swaps and serving-aware recipes continue to work normally.
+
+The 10:00 PM daily close is used because the scheduled dinner is at 7:30 PM.

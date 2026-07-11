@@ -60,6 +60,8 @@ const CATEGORY_ICONS = {
 };
 
 const MEAL_SWAP_STORAGE_KEY = "med-cut-meal-swaps-v1";
+const MEAL_COMPLETION_STORAGE_KEY = "med-cut-meal-completion-v1";
+const MEAL_DAY_CLOSE_HOUR = 22; // 10:00 PM local time
 const FLEX_MEAL_CAPS = [700, 700, 650, 650, 600, 600, 550, 550, 550, 750, 750, 750, 750];
 const SWAP_WINDOW_DAYS = 14;
 const SHAKE_FLAVOR_STORAGE_KEY = "med-cut-fairlife-flavor-v1";
@@ -386,6 +388,101 @@ function getMealSwaps() {
 
 function saveMealSwaps(swaps) {
   localStorage.setItem(MEAL_SWAP_STORAGE_KEY, JSON.stringify(swaps));
+}
+
+function getMealCompletions() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(MEAL_COMPLETION_STORAGE_KEY) || "{}");
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (_) {
+    return {};
+  }
+}
+
+function saveMealCompletions(completions) {
+  localStorage.setItem(MEAL_COMPLETION_STORAGE_KEY, JSON.stringify(completions));
+}
+
+function mealCompletionKey(date, slotIndex) {
+  return `${date}|${slotIndex}`;
+}
+
+function isMealComplete(date, slotIndex) {
+  return getMealCompletions()[mealCompletionKey(date, slotIndex)] === true;
+}
+
+function setMealComplete(date, slotIndex, completed) {
+  const completions = getMealCompletions();
+  const key = mealCompletionKey(date, slotIndex);
+  if (completed) completions[key] = true;
+  else delete completions[key];
+  saveMealCompletions(completions);
+}
+
+function isMealPastDailyClose(isoDate, now = new Date()) {
+  const mealDate = parseLocalDate(isoDate);
+  const today = localDay(now);
+
+  if (mealDate.getTime() < today.getTime()) return true;
+  if (mealDate.getTime() > today.getTime()) return false;
+
+  return now.getHours() >= MEAL_DAY_CLOSE_HOUR;
+}
+
+function refreshDashboardMealCompletionStates() {
+  const rows = [...document.querySelectorAll("#mealList [data-meal-date][data-meal-slot]")];
+  const status = document.getElementById("mealCompletionStatus");
+  if (!rows.length || !status) return;
+
+  let completedCount = 0;
+  let missedCount = 0;
+
+  rows.forEach(row => {
+    const date = row.dataset.mealDate;
+    const slotIndex = Number(row.dataset.mealSlot);
+    const completed = isMealComplete(date, slotIndex);
+    const missed = !completed && isMealPastDailyClose(date);
+    const checkbox = row.querySelector("[data-meal-complete]");
+
+    row.classList.toggle("meal-completed", completed);
+    row.classList.toggle("meal-missed", missed);
+
+    if (checkbox) {
+      checkbox.checked = completed;
+      checkbox.setAttribute("aria-label", completed ? "Meal completed" : "Mark meal as completed");
+    }
+
+    if (completed) completedCount += 1;
+    if (missed) missedCount += 1;
+  });
+
+  const total = rows.length;
+  if (completedCount === total) {
+    status.className = "meal-completion-status all-complete";
+    status.textContent = `All ${total} meals completed today. Nice work.`;
+  } else if (missedCount > 0) {
+    status.className = "meal-completion-status has-missed";
+    status.textContent = `${completedCount} of ${total} completed · ${missedCount} missed after the 10:00 PM daily close.`;
+  } else {
+    status.className = "meal-completion-status";
+    status.textContent = `${completedCount} of ${total} meals completed · unchecked meals turn red at 10:00 PM.`;
+  }
+}
+
+function bindDashboardMealCompletion() {
+  document.querySelectorAll("#mealList [data-meal-complete]").forEach(checkbox => {
+    checkbox.addEventListener("click", event => event.stopPropagation());
+    checkbox.addEventListener("change", () => {
+      setMealComplete(
+        checkbox.dataset.mealDate,
+        Number(checkbox.dataset.mealSlot),
+        checkbox.checked
+      );
+      refreshDashboardMealCompletionStates();
+    });
+  });
+
+  refreshDashboardMealCompletionStates();
 }
 
 function mealSwapKey(date, slotIndex) {
@@ -1101,10 +1198,27 @@ function renderProgramDay() {
     const nameControl = meal.recipeId
       ? `<button class="meal-name-button" data-open-recipe="${meal.recipeId}" data-recipe-portion="${meal.portion}">${meal.name}<span class="dashboard-portion">${meal.swapType === "flex" ? "weekly flex meal" : portionLabel(meal.portion)}</span></button>`
       : `<div class="meal-name-button static-meal-name">${meal.name}<span class="dashboard-portion">weekly flex meal</span></div>`;
+    const completed = isMealComplete(planDay.date, slotIndex);
+    const missed = !completed && isMealPastDailyClose(planDay.date);
     return `
-      <div class="meal dashboard-meal ${meal.isSubstitution ? "swapped" : ""}">
+      <div
+        class="meal dashboard-meal ${meal.isSubstitution ? "swapped" : ""} ${completed ? "meal-completed" : ""} ${missed ? "meal-missed" : ""}"
+        data-meal-date="${planDay.date}"
+        data-meal-slot="${slotIndex}"
+      >
+        <label class="meal-check-wrap" title="Mark this meal as eaten">
+          <input
+            type="checkbox"
+            class="meal-check"
+            data-meal-complete
+            data-meal-date="${planDay.date}"
+            data-meal-slot="${slotIndex}"
+            ${completed ? "checked" : ""}
+          />
+          <span class="meal-check-visual" aria-hidden="true">✓</span>
+        </label>
         <div class="meal-type">${meal.time}</div>
-        <div>${nameControl}${meal.isSubstitution ? `<span class="swap-badge ${meal.swapType === "flex" ? "flex" : ""}">${meal.swapType === "flex" ? "Flex meal" : "Substituted"}</span>` : ""}</div>
+        <div class="meal-details">${nameControl}${meal.isSubstitution ? `<span class="swap-badge ${meal.swapType === "flex" ? "flex" : ""}">${meal.swapType === "flex" ? "Flex meal" : "Substituted"}</span>` : ""}</div>
         <div class="meal-macros">${meal.calories} cal · ${meal.protein}g protein</div>
         <button class="dashboard-swap-button" data-swap-date="${planDay.date}" data-swap-slot="${slotIndex}" ${canSwapDate(planDay.date) ? "" : "disabled"}>${meal.isSubstitution ? "Change" : "Swap"}</button>
       </div>
@@ -1112,6 +1226,7 @@ function renderProgramDay() {
   }).join("");
 
   document.getElementById("mealList").innerHTML = mealMarkup;
+  bindDashboardMealCompletion();
   document.querySelectorAll("#mealList [data-open-recipe]").forEach(element => {
     element.addEventListener("click", event => {
       event.stopPropagation();
@@ -1461,6 +1576,7 @@ bindInstall();
 registerServiceWorker();
 updateClock();
 setInterval(updateClock, 1000);
+setInterval(refreshDashboardMealCompletionStates, 60000);
 renderProgress();
 
 window.addEventListener("resize", () => {

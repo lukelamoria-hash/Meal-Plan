@@ -596,3 +596,117 @@ body.modal-open{overflow:hidden}
   font-size:.84rem;
   font-weight:800;
 }
+
+
+/* Version 9: dashboard meal completion */
+.dashboard-meal{
+  grid-template-columns:38px 86px minmax(0,1fr) auto auto;
+  border:1px solid transparent;
+  border-bottom-color:var(--line);
+  border-radius:14px;
+  padding:12px 10px;
+  margin-bottom:5px;
+  transition:background-color .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+.dashboard-meal:last-child{border-bottom-color:transparent}
+.dashboard-meal.meal-completed{
+  background:#e7f4e9;
+  border-color:#9dc9a5;
+  box-shadow:inset 4px 0 0 #2e7d45;
+}
+.dashboard-meal.meal-missed{
+  background:#f9e6e3;
+  border-color:#dfaaa3;
+  box-shadow:inset 4px 0 0 var(--red);
+}
+.dashboard-meal.meal-completed .meal-name-button,
+.dashboard-meal.meal-completed .meal-type{color:#1f6336}
+.dashboard-meal.meal-missed .meal-name-button,
+.dashboard-meal.meal-missed .meal-type{color:#81352f}
+.meal-check-wrap{
+  align-self:center;
+  justify-self:center;
+  display:grid;
+  place-items:center;
+  width:28px;
+  height:28px;
+  cursor:pointer;
+  position:relative;
+}
+.meal-check{
+  position:absolute;
+  opacity:0;
+  width:1px;
+  height:1px;
+}
+.meal-check-visual{
+  width:26px;
+  height:26px;
+  border-radius:8px;
+  border:2px solid #aeb8b1;
+  display:grid;
+  place-items:center;
+  background:white;
+  color:transparent;
+  font-size:.9rem;
+  font-weight:950;
+  transition:all .18s ease;
+}
+.meal-check:focus-visible + .meal-check-visual{
+  outline:3px solid rgba(46,107,80,.22);
+  outline-offset:2px;
+}
+.meal-check:checked + .meal-check-visual{
+  border-color:#2e7d45;
+  background:#2e7d45;
+  color:white;
+}
+.meal-missed .meal-check-visual{
+  border-color:#c7776e;
+  background:#fff7f6;
+}
+.meal-completion-status{
+  margin:12px 0 4px;
+  border-radius:12px;
+  background:#f1f4f0;
+  color:var(--muted);
+  padding:10px 12px;
+  font-size:.8rem;
+  font-weight:750;
+}
+.meal-completion-status.all-complete{
+  background:#e7f4e9;
+  color:#1f6336;
+}
+.meal-completion-status.has-missed{
+  background:#f9e6e3;
+  color:#81352f;
+}
+
+@media(max-width:680px){
+  .dashboard-meal{
+    grid-template-columns:34px 68px minmax(0,1fr) auto;
+    gap:9px;
+  }
+  .dashboard-meal .meal-check-wrap{
+    grid-column:1;
+    grid-row:1/3;
+  }
+  .dashboard-meal .meal-type{
+    grid-column:2;
+    grid-row:1;
+  }
+  .dashboard-meal .meal-details{
+    grid-column:3;
+    grid-row:1;
+  }
+  .dashboard-meal .meal-macros{
+    grid-column:3;
+    grid-row:2;
+    text-align:left;
+  }
+  .dashboard-meal .dashboard-swap-button{
+    grid-column:4;
+    grid-row:1/3;
+  }
+}
