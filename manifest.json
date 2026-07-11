@@ -1,0 +1,9 @@
+{
+  "name": "Mediterranean 90-Day Cut",
+  "short_name": "Meal Plan",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f0e7",
+  "theme_color": "#173a2c",
+  "description": "Personal 90-day Mediterranean meal-plan and progress app."
+}

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#173a2c" />
+  <title>Mediterranean 90-Day Cut</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Mediterranean 90-Day Cut</p>
+      <h1>Today</h1>
+      <p id="dateLabel" class="muted"></p>
+    </div>
+    <button id="installBtn" class="secondary hidden">Install app</button>
+  </header>
+
+  <main class="container">
+    <section class="card hero">
+      <div>
+        <p class="eyebrow">Your timeline</p>
+        <h2 id="dayLabel">Day 1 of 90</h2>
+        <p id="weekLabel" class="muted">Week 1</p>
+      </div>
+      <div>
+        <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+        <p id="daysRemaining" class="muted small"></p>
+      </div>
+    </section>
+
+    <section class="stats-grid">
+      <article class="card stat"><span>Starting weight</span><strong>178 lb</strong></article>
+      <article class="card stat"><span>Goal weight</span><strong>155 lb</strong></article>
+      <article class="card stat"><span>Today's target range</span><strong id="targetWeight"></strong></article>
+      <article class="card stat"><span>Calories</span><strong id="calorieTarget"></strong></article>
+    </section>
+
+    <section class="main-grid">
+      <article class="card">
+        <div class="section-head">
+          <div><p class="eyebrow">Today</p><h2>Meal plan</h2></div>
+          <span id="proteinTarget" class="pill"></span>
+        </div>
+        <div id="mealList"></div>
+      </article>
+
+      <article class="card">
+        <div class="section-head">
+          <div><p class="eyebrow">Daily check-in</p><h2>Stay on track</h2></div>
+        </div>
+        <div class="check-list">
+          <label><input type="checkbox" data-habit="calories"> Hit calorie target</label>
+          <label><input type="checkbox" data-habit="protein"> Hit protein target</label>
+          <label><input type="checkbox" data-habit="water"> Drink 100+ oz water</label>
+          <label><input type="checkbox" data-habit="workout"> Complete workout</label>
+          <label><input type="checkbox" data-habit="steps"> Hit step goal</label>
+        </div>
+        <div class="weight-box">
+          <label for="weightInput">Today's weight</label>
+          <div class="input-row">
+            <input id="weightInput" type="number" step="0.1" placeholder="178.0" />
+            <button id="saveWeight">Save</button>
+          </div>
+          <p id="weightMessage" class="muted small"></p>
+        </div>
+      </article>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <div><p class="eyebrow">This week</p><h2>Grocery list</h2></div>
+        <button id="groceryToggle" class="secondary">Show list</button>
+      </div>
+      <div id="groceryList" class="grocery-grid hidden"></div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="#">Dashboard</a>
+    <a href="#mealList">Meals</a>
+    <a href="#groceryList">Groceries</a>
+    <a href="#weightInput">Progress</a>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html>
