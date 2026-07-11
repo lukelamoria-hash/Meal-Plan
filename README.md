@@ -57,3 +57,24 @@ Weight entries, swaps, habits, shake flavor, and the maintenance-calorie setting
 - Meal swaps and serving-aware recipes continue to work normally.
 
 The 10:00 PM daily close is used because the scheduled dinner is at 7:30 PM.
+
+
+## Version 10: synchronized plan checkoffs
+
+- The 13-week plan now displays a checkbox for each scheduled meal.
+- Checking a meal on the dashboard immediately marks that same dated meal complete in the plan.
+- Checking a meal in the plan updates the dashboard.
+- Completed meals display green in both views.
+- Unchecked meals display red in both views after the 10:00 PM local daily close.
+- The same browser storage record is used, so no duplicate checkoff data is created.
+
+
+## Version 11: routine checkoffs
+
+- Black coffee, Fairlife shake #1, and Fairlife shake #2 are separate routine entries.
+- Each routine item has its own checkbox on the dashboard and in the 13-week plan.
+- Completion is synchronized between both views and saved by date.
+- Completed routine items turn green.
+- An unchecked routine item turns red two hours after its scheduled time.
+- Checking it later still changes it from red to green.
+- Black coffee contributes zero calories; the two shakes still contribute 300 calories and 60g protein daily.

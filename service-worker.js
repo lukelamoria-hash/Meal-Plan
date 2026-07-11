@@ -1,4 +1,4 @@
-const CACHE_NAME = "mediterranean-cut-v9";
+const CACHE_NAME = "mediterranean-cut-v11";
 const APP_FILES = [
   "./",
   "./index.html",

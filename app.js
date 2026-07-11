@@ -61,7 +61,9 @@ const CATEGORY_ICONS = {
 
 const MEAL_SWAP_STORAGE_KEY = "med-cut-meal-swaps-v1";
 const MEAL_COMPLETION_STORAGE_KEY = "med-cut-meal-completion-v1";
+const ROUTINE_COMPLETION_STORAGE_KEY = "med-cut-routine-completion-v1";
 const MEAL_DAY_CLOSE_HOUR = 22; // 10:00 PM local time
+const ROUTINE_GRACE_MINUTES = 120; // turns red two hours after its scheduled time
 const FLEX_MEAL_CAPS = [700, 700, 650, 650, 600, 600, 550, 550, 550, 750, 750, 750, 750];
 const SWAP_WINDOW_DAYS = 14;
 const SHAKE_FLAVOR_STORAGE_KEY = "med-cut-fairlife-flavor-v1";
@@ -326,18 +328,33 @@ function isWorkday(isoDate) {
 function routineForDay(day) {
   const shake = fairlifeNutrition();
   const workday = isWorkday(day.date);
+  const firstTime = workday ? "2:30 AM" : "7:00 AM";
   return [
     {
-      time: workday ? "2:30 AM" : "7:00 AM",
+      time: firstTime,
       category: "Routine",
-      name: `Black Coffee + Fairlife ${shake.label} Shake #1`,
+      name: "Black Coffee",
+      portion: 1,
+      calories: 0,
+      protein: 0,
+      carbs: 0,
+      fat: 0,
+      fiber: 0,
+      routineType: "coffee",
+      routineKey: "coffee"
+    },
+    {
+      time: firstTime,
+      category: "Routine",
+      name: `Fairlife ${shake.label} Shake #1`,
       portion: 1,
       calories: shake.calories,
       protein: shake.protein,
       carbs: shake.carbs,
       fat: shake.fat,
       fiber: shake.fiber,
-      routineType: "coffee-shake"
+      routineType: "shake",
+      routineKey: "shake-1"
     },
     {
       time: workday ? "6:00 AM" : "3:00 PM",
@@ -349,18 +366,40 @@ function routineForDay(day) {
       carbs: shake.carbs,
       fat: shake.fat,
       fiber: shake.fiber,
-      routineType: "shake"
+      routineType: "shake",
+      routineKey: "shake-2"
     }
   ];
 }
 
-function routineItemMarkup(item, compact = false) {
+function routineItemMarkup(item, date, compact = false) {
+  const completed = isRoutineComplete(date, item.routineKey);
+  const missed = !completed && isRoutinePastWindow(date, item.time);
+  const description = item.routineType === "coffee"
+    ? "Plain black coffee · 0 calories"
+    : "1 bottle (340 mL)";
   return `
-    <div class="routine-item ${compact ? "compact" : ""}">
+    <div
+      class="routine-item ${compact ? "compact" : ""} ${completed ? "routine-completed" : ""} ${missed ? "routine-missed" : ""}"
+      data-routine-date="${date}"
+      data-routine-key="${item.routineKey}"
+      data-routine-time="${item.time}"
+    >
+      <label class="meal-check-wrap routine-check-wrap" title="Mark this routine item complete">
+        <input
+          type="checkbox"
+          class="meal-check"
+          data-routine-complete
+          data-routine-date="${date}"
+          data-routine-key="${item.routineKey}"
+          ${completed ? "checked" : ""}
+        />
+        <span class="meal-check-visual" aria-hidden="true">✓</span>
+      </label>
       <div class="routine-time">${item.time}</div>
       <div class="routine-main">
         <strong>${item.name}</strong>
-        <span>${item.routineType === "coffee-shake" ? "Plain black coffee adds 0 calories" : "1 bottle (340 mL)"}</span>
+        <span>${description}</span>
       </div>
       <div class="routine-macros">${item.calories} cal · ${item.protein}g protein · ${item.carbs}g carbs · ${item.fat}g fat</div>
       <span class="locked-badge">Fixed</span>
@@ -401,6 +440,95 @@ function getMealCompletions() {
 
 function saveMealCompletions(completions) {
   localStorage.setItem(MEAL_COMPLETION_STORAGE_KEY, JSON.stringify(completions));
+}
+
+function getRoutineCompletions() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(ROUTINE_COMPLETION_STORAGE_KEY) || "{}");
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (_) {
+    return {};
+  }
+}
+
+function saveRoutineCompletions(completions) {
+  localStorage.setItem(ROUTINE_COMPLETION_STORAGE_KEY, JSON.stringify(completions));
+}
+
+function routineCompletionKey(date, routineKey) {
+  return `${date}|${routineKey}`;
+}
+
+function isRoutineComplete(date, routineKey) {
+  return getRoutineCompletions()[routineCompletionKey(date, routineKey)] === true;
+}
+
+function setRoutineComplete(date, routineKey, completed) {
+  const completions = getRoutineCompletions();
+  const key = routineCompletionKey(date, routineKey);
+  if (completed) completions[key] = true;
+  else delete completions[key];
+  saveRoutineCompletions(completions);
+}
+
+function timeToMinutes(timeText) {
+  const match = String(timeText).match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return 0;
+  let hours = Number(match[1]) % 12;
+  const minutes = Number(match[2]);
+  if (match[3].toUpperCase() === "PM") hours += 12;
+  return hours * 60 + minutes;
+}
+
+function isRoutinePastWindow(isoDate, scheduledTime, now = new Date()) {
+  const routineDate = parseLocalDate(isoDate);
+  const today = localDay(now);
+
+  if (routineDate.getTime() < today.getTime()) return true;
+  if (routineDate.getTime() > today.getTime()) return false;
+
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  return currentMinutes >= timeToMinutes(scheduledTime) + ROUTINE_GRACE_MINUTES;
+}
+
+function refreshRoutineCompletionStates() {
+  const rows = [...document.querySelectorAll("[data-routine-date][data-routine-key]")];
+
+  rows.forEach(row => {
+    const date = row.dataset.routineDate;
+    const routineKey = row.dataset.routineKey;
+    const scheduledTime = row.dataset.routineTime || "11:59 PM";
+    const completed = isRoutineComplete(date, routineKey);
+    const missed = !completed && isRoutinePastWindow(date, scheduledTime);
+    const checkbox = row.querySelector("[data-routine-complete]");
+
+    row.classList.toggle("routine-completed", completed);
+    row.classList.toggle("routine-missed", missed);
+
+    if (checkbox) {
+      checkbox.checked = completed;
+      checkbox.setAttribute(
+        "aria-label",
+        completed ? "Routine item completed" : "Mark routine item complete"
+      );
+    }
+  });
+}
+
+function bindRoutineCompletion(rootSelector) {
+  document.querySelectorAll(`${rootSelector} [data-routine-complete]`).forEach(checkbox => {
+    checkbox.addEventListener("click", event => event.stopPropagation());
+    checkbox.addEventListener("change", () => {
+      setRoutineComplete(
+        checkbox.dataset.routineDate,
+        checkbox.dataset.routineKey,
+        checkbox.checked
+      );
+      refreshRoutineCompletionStates();
+    });
+  });
+
+  refreshRoutineCompletionStates();
 }
 
 function mealCompletionKey(date, slotIndex) {
@@ -483,6 +611,46 @@ function bindDashboardMealCompletion() {
   });
 
   refreshDashboardMealCompletionStates();
+}
+
+function refreshPlanMealCompletionStates() {
+  const rows = [...document.querySelectorAll("#weekDays [data-plan-meal-date][data-plan-meal-slot]")];
+
+  rows.forEach(row => {
+    const date = row.dataset.planMealDate;
+    const slotIndex = Number(row.dataset.planMealSlot);
+    const completed = isMealComplete(date, slotIndex);
+    const missed = !completed && isMealPastDailyClose(date);
+    const checkbox = row.querySelector("[data-plan-meal-complete]");
+
+    row.classList.toggle("meal-completed", completed);
+    row.classList.toggle("meal-missed", missed);
+
+    if (checkbox) {
+      checkbox.checked = completed;
+      checkbox.setAttribute(
+        "aria-label",
+        completed ? "Meal completed" : "Mark meal as completed"
+      );
+    }
+  });
+}
+
+function bindPlanMealCompletion() {
+  document.querySelectorAll("#weekDays [data-plan-meal-complete]").forEach(checkbox => {
+    checkbox.addEventListener("click", event => event.stopPropagation());
+    checkbox.addEventListener("change", () => {
+      setMealComplete(
+        checkbox.dataset.mealDate,
+        Number(checkbox.dataset.mealSlot),
+        checkbox.checked
+      );
+      refreshPlanMealCompletionStates();
+      refreshDashboardMealCompletionStates();
+    });
+  });
+
+  refreshPlanMealCompletionStates();
 }
 
 function mealSwapKey(date, slotIndex) {
@@ -799,6 +967,8 @@ function bindMealSwaps() {
 
 function planMealMarkup(day, meal, slotIndex) {
   const editable = canSwapDate(day.date);
+  const completed = isMealComplete(day.date, slotIndex);
+  const missed = !completed && isMealPastDailyClose(day.date);
   const badge = meal.isSubstitution
     ? `<span class="swap-badge ${meal.swapType === "flex" ? "flex" : ""}">${meal.swapType === "flex" ? "Weekly flex meal" : "Substituted"}</span>`
     : "";
@@ -806,7 +976,22 @@ function planMealMarkup(day, meal, slotIndex) {
     ? `<button class="plan-meal-name" data-open-recipe="${meal.recipeId}" data-recipe-portion="${meal.portion}">${meal.name}</button>`
     : `<div class="plan-meal-name">${meal.name}</div>`;
   return `
-    <div class="plan-meal ${meal.isSubstitution ? "swapped" : ""} ${meal.swapType === "flex" ? "flex-swapped" : ""}">
+    <div
+      class="plan-meal ${meal.isSubstitution ? "swapped" : ""} ${meal.swapType === "flex" ? "flex-swapped" : ""} ${completed ? "meal-completed" : ""} ${missed ? "meal-missed" : ""}"
+      data-plan-meal-date="${day.date}"
+      data-plan-meal-slot="${slotIndex}"
+    >
+      <label class="meal-check-wrap plan-meal-check-wrap" title="Mark this meal as eaten">
+        <input
+          type="checkbox"
+          class="meal-check"
+          data-plan-meal-complete
+          data-meal-date="${day.date}"
+          data-meal-slot="${slotIndex}"
+          ${completed ? "checked" : ""}
+        />
+        <span class="meal-check-visual" aria-hidden="true">✓</span>
+      </label>
       <div class="plan-meal-time">${meal.time}</div>
       <div class="plan-meal-category">${meal.category}</div>
       <div class="meal-name-wrap">${nameControl}${badge}</div>
@@ -888,7 +1073,7 @@ function renderPlanWeek(weekNumber) {
           <span class="shift-badge ${isWorkday(day.date) ? "work" : "off"}">${isWorkday(day.date) ? `Work ${WORK_SHIFT}` : "Off work"}</span>
           <span>Fixed routine is included in daily totals</span>
         </div>
-        <div class="plan-routine">${day.routine.map(item => routineItemMarkup(item, true)).join("")}</div>
+        <div class="plan-routine">${day.routine.map(item => routineItemMarkup(item, day.date, true)).join("")}</div>
         <div class="plan-meals">${day.meals.map((meal, slotIndex) => planMealMarkup(day, meal, slotIndex)).join("")}</div>
         <footer class="plan-day-total">
           <div class="plan-total-label"><strong>Daily total</strong><span>${differenceLabel}</span></div>
@@ -902,6 +1087,8 @@ function renderPlanWeek(weekNumber) {
     `;
   }).join("");
 
+  bindRoutineCompletion("#weekDays");
+  bindPlanMealCompletion();
   document.querySelectorAll("#weekDays [data-open-recipe]").forEach(button => {
     button.addEventListener("click", () => openRecipe(button.dataset.openRecipe, Number(button.dataset.recipePortion || 1)));
   });
@@ -1193,7 +1380,10 @@ function renderProgramDay() {
   document.getElementById("todayShiftStatus").textContent = isWorkday(planDay.date)
     ? `Workday · shift ${WORK_SHIFT} · breakfast is scheduled after work`
     : "Off work · standard meal timing";
-  document.getElementById("routineList").innerHTML = routine.map(item => routineItemMarkup(item)).join("");
+  document.getElementById("routineList").innerHTML = routine
+    .map(item => routineItemMarkup(item, planDay.date))
+    .join("");
+  bindRoutineCompletion("#routineList");
   const mealMarkup = meals.map((meal, slotIndex) => {
     const nameControl = meal.recipeId
       ? `<button class="meal-name-button" data-open-recipe="${meal.recipeId}" data-recipe-portion="${meal.portion}">${meal.name}<span class="dashboard-portion">${meal.swapType === "flex" ? "weekly flex meal" : portionLabel(meal.portion)}</span></button>`
@@ -1576,7 +1766,11 @@ bindInstall();
 registerServiceWorker();
 updateClock();
 setInterval(updateClock, 1000);
-setInterval(refreshDashboardMealCompletionStates, 60000);
+setInterval(() => {
+  refreshDashboardMealCompletionStates();
+  refreshPlanMealCompletionStates();
+  refreshRoutineCompletionStates();
+}, 60000);
 renderProgress();
 
 window.addEventListener("resize", () => {

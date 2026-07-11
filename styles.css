@@ -710,3 +710,107 @@ body.modal-open{overflow:hidden}
     grid-row:1/3;
   }
 }
+
+
+/* Version 10: synchronized meal checkoffs in the 13-week plan */
+.plan-meal{
+  transition:background-color .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+.plan-meal.meal-completed{
+  background:#e7f4e9;
+  border-color:#9dc9a5;
+  box-shadow:inset 4px 0 0 #2e7d45;
+}
+.plan-meal.meal-missed{
+  background:#f9e6e3;
+  border-color:#dfaaa3;
+  box-shadow:inset 4px 0 0 var(--red);
+}
+.plan-meal.meal-completed .plan-meal-name,
+.plan-meal.meal-completed .plan-meal-time,
+.plan-meal.meal-completed .plan-meal-category{
+  color:#1f6336;
+}
+.plan-meal.meal-missed .plan-meal-name,
+.plan-meal.meal-missed .plan-meal-time,
+.plan-meal.meal-missed .plan-meal-category{
+  color:#81352f;
+}
+.plan-meal-check-wrap{
+  flex:0 0 auto;
+  margin-right:2px;
+}
+
+@media(max-width:720px){
+  .plan-meal-check-wrap{
+    grid-column:1;
+    grid-row:1/3;
+    align-self:center;
+  }
+}
+
+
+/* Version 11: coffee and Fairlife routine checkoffs */
+.routine-item{
+  grid-template-columns:38px 86px minmax(0,1fr) auto auto;
+  border:1px solid transparent;
+  border-top-color:var(--line);
+  border-radius:13px;
+  padding:12px 9px;
+  transition:background-color .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+.routine-item:first-child{border-top-color:transparent}
+.plan-routine .routine-item{
+  grid-template-columns:34px 82px minmax(0,1fr) auto auto;
+}
+.routine-check-wrap{
+  align-self:center;
+  justify-self:center;
+}
+.routine-item.routine-completed{
+  background:#e7f4e9;
+  border-color:#9dc9a5;
+  box-shadow:inset 4px 0 0 #2e7d45;
+}
+.routine-item.routine-missed{
+  background:#f9e6e3;
+  border-color:#dfaaa3;
+  box-shadow:inset 4px 0 0 var(--red);
+}
+.routine-item.routine-completed .routine-time,
+.routine-item.routine-completed .routine-main strong{
+  color:#1f6336;
+}
+.routine-item.routine-missed .routine-time,
+.routine-item.routine-missed .routine-main strong{
+  color:#81352f;
+}
+
+@media(max-width:760px){
+  .routine-item,.plan-routine .routine-item{
+    grid-template-columns:34px 68px minmax(0,1fr) auto;
+    gap:9px;
+  }
+  .routine-check-wrap{
+    grid-column:1;
+    grid-row:1/3;
+  }
+  .routine-time{
+    grid-column:2;
+    grid-row:1;
+  }
+  .routine-main{
+    grid-column:3;
+    grid-row:1;
+  }
+  .routine-macros{
+    grid-column:3;
+    grid-row:2;
+    text-align:left;
+  }
+  .routine-item .locked-badge{
+    grid-column:4;
+    grid-row:1/3;
+    align-self:center;
+  }
+}
