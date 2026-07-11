@@ -586,3 +586,13 @@ body.modal-open{overflow:hidden}
 .day-phase-badge.recomp{background:#dfece4;color:var(--green)}
 @media(max-width:980px){.phase-card{grid-template-columns:1fr 1fr}.maintenance-calibration{grid-column:1/-1}}
 @media(max-width:680px){.phase-card,.phase-roadmap{grid-template-columns:1fr}.maintenance-calibration{grid-column:auto}.phase-title-row{align-items:flex-start;flex-direction:column}.maintenance-input-row{align-items:stretch}}
+
+.recipe-scale-notice{
+  margin:0 0 18px;
+  padding:11px 13px;
+  border-radius:12px;
+  background:var(--green-3);
+  color:var(--green);
+  font-size:.84rem;
+  font-weight:800;
+}

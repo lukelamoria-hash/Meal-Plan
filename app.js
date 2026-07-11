@@ -118,7 +118,7 @@ function recipeCardMarkup(recipe) {
           <div><span>Fat</span><strong>${recipe.fat}g</strong></div>
           <div><span>Fiber</span><strong>${recipe.fiber}g</strong></div>
         </div>
-        <button class="recipe-open" data-open-recipe="${recipe.id}">View recipe</button>
+        <button class="recipe-open" data-open-recipe="${recipe.id}" data-recipe-portion="1">View recipe</button>
       </div>
     </article>
   `;
@@ -138,7 +138,7 @@ function renderRecipeLibrary() {
     `${filtered.length} ${filtered.length === 1 ? "recipe" : "recipes"}${activeRecipeFilter === "All" ? "" : ` in ${activeRecipeFilter}`}`;
 
   document.querySelectorAll("[data-open-recipe]").forEach(button => {
-    button.addEventListener("click", () => openRecipe(button.dataset.openRecipe));
+    button.addEventListener("click", () => openRecipe(button.dataset.openRecipe, Number(button.dataset.recipePortion || 1)));
   });
 }
 
@@ -150,23 +150,111 @@ function setRecipeFilter(category) {
   renderRecipeLibrary();
 }
 
-function openRecipe(recipeId) {
+function parseIngredientQuantity(value) {
+  const text = String(value).trim();
+  if (/^\d+\s+\d+\/\d+$/.test(text)) {
+    const [whole, fraction] = text.split(/\s+/);
+    const [numerator, denominator] = fraction.split("/").map(Number);
+    return Number(whole) + numerator / denominator;
+  }
+  if (/^\d+\/\d+$/.test(text)) {
+    const [numerator, denominator] = text.split("/").map(Number);
+    return numerator / denominator;
+  }
+  return Number(text);
+}
+
+function formatScaledQuantity(value, unit = "") {
+  const rounded = Math.round(Number(value) * 100) / 100;
+  if (!Number.isFinite(rounded)) return String(value);
+
+  const preciseUnits = new Set(["g", "kg", "ml", "l", "oz", "lb"]);
+  if (preciseUnits.has(String(unit).toLowerCase())) {
+    return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1).replace(/\.0$/, "");
+  }
+
+  const whole = Math.floor(rounded + 1e-9);
+  const remainder = rounded - whole;
+  const fractions = [
+    [0, ""], [1 / 8, "⅛"], [1 / 4, "¼"], [1 / 3, "⅓"], [3 / 8, "⅜"],
+    [1 / 2, "½"], [5 / 8, "⅝"], [2 / 3, "⅔"], [3 / 4, "¾"], [7 / 8, "⅞"], [1, ""]
+  ];
+  let best = fractions[0];
+  for (const option of fractions) {
+    if (Math.abs(remainder - option[0]) < Math.abs(remainder - best[0])) best = option;
+  }
+
+  if (best[0] === 1) return String(whole + 1);
+  if (!best[1]) return String(whole);
+  return whole > 0 ? `${whole}${best[1]}` : best[1];
+}
+
+function scaleMeasuredText(text, portion) {
+  return String(text).replace(
+    /(\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?)\s*(tsp|tbsp|teaspoons?|tablespoons?|cups?|g|kg|ml|l|oz|lb)\b/gi,
+    (match, quantityText, unit) => {
+      const quantity = parseIngredientQuantity(quantityText);
+      if (!Number.isFinite(quantity)) return match;
+      return `${formatScaledQuantity(quantity * portion, unit)} ${unit}`;
+    }
+  );
+}
+
+function scaleIngredientLine(ingredient, portion) {
+  if (Math.abs(portion - 1) < 0.0001) return ingredient;
+
+  let scaled = String(ingredient);
+  const leading = scaled.match(/^(\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?)(?=\s)/);
+  if (leading) {
+    const quantity = parseIngredientQuantity(leading[1]);
+    if (Number.isFinite(quantity)) {
+      const afterQuantity = scaled.slice(leading[0].length).trimStart();
+      const unitMatch = afterQuantity.match(/^(g|kg|ml|l|oz|lb|tsp|tbsp|teaspoons?|tablespoons?|cups?)\b/i);
+      const unit = unitMatch ? unitMatch[1] : "";
+      scaled = `${formatScaledQuantity(quantity * portion, unit)} ${afterQuantity}`;
+    }
+  }
+
+  scaled = scaled.replace(
+    /(about\s+)(\d+(?:\.\d+)?)\s*(g|kg|ml|l|oz|lb)\b/gi,
+    (match, prefix, quantityText, unit) => `${prefix}${formatScaledQuantity(Number(quantityText) * portion, unit)} ${unit}`
+  );
+
+  if (!leading && /^(pinch|salt|pepper|oregano|cinnamon|parsley|dill|mint|basil)/i.test(scaled)) {
+    scaled = `${scaled} (adjust to taste)`;
+  }
+  return scaled;
+}
+
+function openRecipe(recipeId, requestedPortion = 1) {
   const recipe = RECIPES.find(item => item.id === recipeId);
   if (!recipe) return;
+
+  const portion = Number(requestedPortion) > 0 ? Number(requestedPortion) : 1;
+  const nutrition = nutritionForRecipe(recipe, portion);
+  const isScaled = Math.abs(portion - 1) > 0.0001;
 
   document.getElementById("modalCategory").textContent = recipe.category;
   document.getElementById("modalName").textContent = recipe.name;
   document.getElementById("modalDescription").textContent = recipe.description;
-  document.getElementById("modalCalories").textContent = recipe.calories;
-  document.getElementById("modalProtein").textContent = `${recipe.protein}g`;
-  document.getElementById("modalCarbs").textContent = `${recipe.carbs}g`;
-  document.getElementById("modalFat").textContent = `${recipe.fat}g`;
-  document.getElementById("modalFiber").textContent = `${recipe.fiber}g`;
-  document.getElementById("modalServings").textContent = recipe.servings;
+  document.getElementById("modalCalories").textContent = nutrition.calories;
+  document.getElementById("modalProtein").textContent = `${nutrition.protein}g`;
+  document.getElementById("modalCarbs").textContent = `${nutrition.carbs}g`;
+  document.getElementById("modalFat").textContent = `${nutrition.fat}g`;
+  document.getElementById("modalFiber").textContent = `${nutrition.fiber}g`;
+  document.getElementById("modalServings").textContent = portionLabel(portion);
   document.getElementById("modalPrep").textContent = recipe.prep;
   document.getElementById("modalCook").textContent = recipe.cook;
-  document.getElementById("modalIngredients").innerHTML = recipe.ingredients.map(item => `<li>${item}</li>`).join("");
-  document.getElementById("modalSteps").innerHTML = recipe.steps.map(step => `<li>${step}</li>`).join("");
+  document.getElementById("modalScaleNotice").classList.toggle("hidden", !isScaled);
+  document.getElementById("modalScaleNotice").textContent = isScaled
+    ? `Measurements and macros are scaled for ${portionLabel(portion)}.`
+    : "";
+  document.getElementById("modalIngredients").innerHTML = recipe.ingredients
+    .map(item => `<li>${scaleIngredientLine(item, portion)}</li>`)
+    .join("");
+  document.getElementById("modalSteps").innerHTML = recipe.steps
+    .map(step => `<li>${scaleMeasuredText(step, portion)}</li>`)
+    .join("");
 
   const dialog = document.getElementById("recipeDialog");
   document.body.classList.add("modal-open");
@@ -618,7 +706,7 @@ function planMealMarkup(day, meal, slotIndex) {
     ? `<span class="swap-badge ${meal.swapType === "flex" ? "flex" : ""}">${meal.swapType === "flex" ? "Weekly flex meal" : "Substituted"}</span>`
     : "";
   const nameControl = meal.recipeId
-    ? `<button class="plan-meal-name" data-open-recipe="${meal.recipeId}">${meal.name}</button>`
+    ? `<button class="plan-meal-name" data-open-recipe="${meal.recipeId}" data-recipe-portion="${meal.portion}">${meal.name}</button>`
     : `<div class="plan-meal-name">${meal.name}</div>`;
   return `
     <div class="plan-meal ${meal.isSubstitution ? "swapped" : ""} ${meal.swapType === "flex" ? "flex-swapped" : ""}">
@@ -718,7 +806,7 @@ function renderPlanWeek(weekNumber) {
   }).join("");
 
   document.querySelectorAll("#weekDays [data-open-recipe]").forEach(button => {
-    button.addEventListener("click", () => openRecipe(button.dataset.openRecipe));
+    button.addEventListener("click", () => openRecipe(button.dataset.openRecipe, Number(button.dataset.recipePortion || 1)));
   });
   document.querySelectorAll("#weekDays [data-swap-date]").forEach(button => {
     button.addEventListener("click", () => openSwapDialog(button.dataset.swapDate, Number(button.dataset.swapSlot)));
@@ -1011,7 +1099,7 @@ function renderProgramDay() {
   document.getElementById("routineList").innerHTML = routine.map(item => routineItemMarkup(item)).join("");
   const mealMarkup = meals.map((meal, slotIndex) => {
     const nameControl = meal.recipeId
-      ? `<button class="meal-name-button" data-open-recipe="${meal.recipeId}">${meal.name}<span class="dashboard-portion">${meal.swapType === "flex" ? "weekly flex meal" : portionLabel(meal.portion)}</span></button>`
+      ? `<button class="meal-name-button" data-open-recipe="${meal.recipeId}" data-recipe-portion="${meal.portion}">${meal.name}<span class="dashboard-portion">${meal.swapType === "flex" ? "weekly flex meal" : portionLabel(meal.portion)}</span></button>`
       : `<div class="meal-name-button static-meal-name">${meal.name}<span class="dashboard-portion">weekly flex meal</span></div>`;
     return `
       <div class="meal dashboard-meal ${meal.isSubstitution ? "swapped" : ""}">
@@ -1027,7 +1115,7 @@ function renderProgramDay() {
   document.querySelectorAll("#mealList [data-open-recipe]").forEach(element => {
     element.addEventListener("click", event => {
       event.stopPropagation();
-      openRecipe(element.dataset.openRecipe);
+      openRecipe(element.dataset.openRecipe, Number(element.dataset.recipePortion || 1));
     });
   });
   document.querySelectorAll("#mealList [data-swap-date]").forEach(button => {

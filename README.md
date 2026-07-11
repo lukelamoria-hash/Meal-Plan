@@ -37,3 +37,11 @@ The requested loss rate is aggressive. The app labels it as a requested trend li
 4. Commit the changes. Vercel should deploy automatically.
 
 Weight entries, swaps, habits, shake flavor, and the maintenance-calorie setting are stored locally in the browser and do not yet synchronize across devices.
+
+
+## Version 8: serving-aware recipes
+
+- Opening a meal from the dashboard or 13-week plan now carries its scheduled serving size into the recipe.
+- Ingredient quantities, embedded gram measurements, step measurements, calories, and macros scale automatically.
+- Common portions display as practical fractions such as ¾, 1¼, and 1½ servings.
+- Recipe-library cards still open at the base one-serving recipe.
