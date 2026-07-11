@@ -157,18 +157,22 @@
         <div>
           <p class="eyebrow">90-day schedule</p>
           <h1>Weeks 1–13</h1>
-          <p class="muted">Every day includes a meal time, planned portion, calculated nutrition, and daily totals. Week 13 contains the final six days of the 90-day plan.</p>
+          <p class="muted">Every day includes meal times, calculated nutrition, and live totals. Swap meals from today through 14 days ahead; Week 13 contains the final six days of the 90-day plan.</p>
         </div>
       </div>
 
       <section class="card plan-tools">
         <div id="weekSelector" class="week-selector" aria-label="Select a week"></div>
-        <div class="plan-source-note">
-          <strong>Nutrition calculation:</strong> recipe macros are calculated from listed ingredient weights using USDA FoodData Central reference values. Packaged foods use a fixed reference-label value, so match the listed serving or substitute your product label.
+        <div class="plan-note-grid">
+          <div class="plan-source-note">
+            <strong>Nutrition calculation:</strong> recipe macros are calculated from listed ingredient weights using USDA FoodData Central reference values. Packaged foods use a fixed reference-label value, so match the listed serving or substitute your product label.
+          </div>
+          <div id="swapWindowNote" class="plan-source-note swap-window-note"></div>
         </div>
       </section>
 
       <section id="weekSummary" class="card week-summary"></section>
+      <section id="weekFlexCard" class="card flex-meal-card"></section>
       <section id="weekDays" class="week-days" aria-live="polite"></section>
     </section>
 
@@ -346,6 +350,78 @@
       </div>
 
       <p class="modal-disclaimer">Calculated nutrition uses the listed gram weights and USDA FoodData Central reference values. Packaged products can vary, so match the fixed reference serving or use your product label.</p>
+    </article>
+  </dialog>
+
+
+  <dialog id="swapDialog" class="swap-dialog">
+    <article class="swap-modal">
+      <button id="closeSwapDialog" class="modal-close" aria-label="Close meal substitution">×</button>
+      <div class="swap-modal-heading">
+        <p class="eyebrow">Meal substitution</p>
+        <h2 id="swapDialogTitle">Swap a meal</h2>
+        <p id="swapDialogSubtitle" class="muted"></p>
+      </div>
+
+      <section class="swap-current-card">
+        <span>Currently scheduled</span>
+        <strong id="swapCurrentMeal"></strong>
+        <small id="swapCurrentMacros"></small>
+      </section>
+
+      <div class="swap-option-grid">
+        <section class="swap-option-card">
+          <div>
+            <p class="eyebrow">Recipe swap</p>
+            <h3>Choose another meal</h3>
+            <p class="muted small-copy">Swaps stay in the same meal category. Recipes already used in that week appear first.</p>
+          </div>
+          <label class="swap-field">
+            Replacement recipe
+            <select id="swapRecipeSelect"></select>
+          </label>
+          <label class="swap-field">
+            Serving size
+            <select id="swapPortionSelect">
+              <option value="0.75">¾ serving</option>
+              <option value="1">1 serving</option>
+              <option value="1.25">1¼ servings</option>
+              <option value="1.5">1½ servings</option>
+            </select>
+          </label>
+          <div id="swapRecipePreview" class="swap-macro-preview"></div>
+          <button id="saveRecipeSwap" class="button primary">Use this recipe</button>
+        </section>
+
+        <section class="swap-option-card flex-option-card">
+          <div class="flex-option-heading">
+            <div>
+              <p class="eyebrow">Weekly cheat / flex meal</p>
+              <h3 id="flexMealCapHeading">Up to 700 calories</h3>
+            </div>
+            <span id="flexMealStatus" class="pill"></span>
+          </div>
+          <p class="muted small-copy">Use once during the selected week. Enter nutrition from the restaurant or package label so the day's totals stay grounded.</p>
+          <label class="swap-field">
+            Meal name
+            <input id="flexMealName" type="text" maxlength="60" placeholder="Example: Burger and side salad" />
+          </label>
+          <div class="flex-macro-fields">
+            <label>Calories<input id="flexCalories" type="number" min="100" step="1" required /></label>
+            <label>Protein (g)<input id="flexProtein" type="number" min="0" step="0.1" required /></label>
+            <label>Carbs (g)<input id="flexCarbs" type="number" min="0" step="0.1" required /></label>
+            <label>Fat (g)<input id="flexFat" type="number" min="0" step="0.1" required /></label>
+            <label>Fiber (g)<input id="flexFiber" type="number" min="0" step="0.1" required /></label>
+          </div>
+          <p id="flexMealMessage" class="form-message" aria-live="polite"></p>
+          <button id="saveFlexSwap" class="button flex-button">Use weekly flex meal</button>
+        </section>
+      </div>
+
+      <div class="swap-modal-footer">
+        <button id="restoreScheduledMeal" class="text-button danger hidden">Restore originally scheduled meal</button>
+        <span id="swapLockMessage" class="muted small-copy"></span>
+      </div>
     </article>
   </dialog>
 

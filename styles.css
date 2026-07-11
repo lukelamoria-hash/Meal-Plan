@@ -446,3 +446,78 @@ body.modal-open{overflow:hidden}
 }
 
 .dashboard-portion{display:block;color:var(--muted);font-size:.7rem;font-weight:650;margin-top:3px}
+
+
+/* Meal substitutions and weekly flex meal */
+.plan-note-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.swap-window-note{background:#f7f1df}
+.flex-meal-card{display:grid;grid-template-columns:1.2fr .7fr .7fr;align-items:center;gap:18px;margin-bottom:14px;background:linear-gradient(135deg,#fffaf0,#fffdf8)}
+.flex-meal-card h2{margin-bottom:5px}
+.flex-card-cap span,.flex-card-status span{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px}
+.flex-card-cap strong,.flex-card-status strong{font-size:1.14rem}
+.flex-card-status.used strong{color:var(--green-2)}
+.flex-card-status.locked strong{color:var(--muted)}
+.plan-meal{grid-template-columns:92px 90px minmax(180px,1fr) 95px repeat(4,70px) 70px}
+.plan-meal.swapped{background:#fbf8ee}
+.plan-meal.flex-swapped{background:#fff8e7}
+.meal-name-wrap{min-width:0}
+.meal-name-wrap .plan-meal-name{display:block;width:100%}
+.swap-badge{display:inline-block;margin-top:4px;border-radius:999px;padding:3px 7px;background:#e7efe9;color:var(--green);font-size:.62rem;font-weight:850;text-transform:uppercase;letter-spacing:.06em}
+.swap-badge.flex{background:#f5e4b8;color:#6e4a10}
+.swap-meal-button{border:1px solid var(--line);background:white;color:var(--green);border-radius:10px;padding:7px 8px;font-size:.72rem;font-weight:850}
+.swap-meal-button:hover:not(:disabled){border-color:var(--green-2)}
+.swap-meal-button:disabled{cursor:not-allowed;color:#9aa19c;background:#f5f5f2}
+.dashboard-meal{grid-template-columns:86px minmax(0,1fr) auto auto}
+.dashboard-meal.swapped{background:#fbf8ee;border-radius:12px;padding-left:10px;padding-right:10px}
+.dashboard-swap-button{border:1px solid var(--line);background:white;color:var(--green);border-radius:10px;padding:7px 9px;font-size:.72rem;font-weight:850}
+.dashboard-swap-button:disabled{color:#9aa19c;background:#f5f5f2}
+.swap-dialog{border:0;padding:0;background:transparent;width:min(1020px,calc(100% - 24px));max-height:calc(100vh - 24px)}
+.swap-dialog::backdrop{background:rgba(9,20,15,.64);backdrop-filter:blur(5px)}
+.swap-modal{position:relative;background:var(--card);border-radius:25px;box-shadow:0 24px 80px rgba(0,0,0,.25);padding:26px;max-height:calc(100vh - 24px);overflow:auto}
+.swap-modal-heading{padding-right:45px}
+.swap-modal-heading h2{font-size:clamp(1.7rem,4vw,2.5rem);margin-bottom:7px}
+.swap-current-card{display:grid;gap:4px;background:#f2f5f1;border-radius:15px;padding:14px 16px;margin:18px 0}
+.swap-current-card span{font-size:.67rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:850}
+.swap-current-card small{color:var(--muted)}
+.swap-option-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.swap-option-card{border:1px solid var(--line);border-radius:18px;padding:18px;display:grid;gap:13px;align-content:start}
+.flex-option-card{background:#fffaf0}
+.flex-option-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.small-copy{font-size:.78rem;line-height:1.5}
+.swap-field{display:grid;gap:7px;font-size:.76rem;font-weight:850;color:var(--muted)}
+.swap-field select,.swap-field input,.flex-macro-fields input{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px;background:white;color:var(--ink);font:inherit}
+.swap-field select:focus,.swap-field input:focus,.flex-macro-fields input:focus{outline:3px solid rgba(46,107,80,.15);border-color:var(--green-2)}
+.swap-macro-preview{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.swap-macro-preview div{background:#eef4ef;border-radius:11px;padding:9px;text-align:center}
+.swap-macro-preview span,.swap-macro-preview strong{display:block}
+.swap-macro-preview span{font-size:.58rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.swap-macro-preview strong{margin-top:3px;font-size:.88rem}
+.flex-macro-fields{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.flex-macro-fields label{display:grid;gap:5px;font-size:.66rem;font-weight:850;color:var(--muted)}
+.flex-button{background:#8b5d16;color:white}
+.flex-button:disabled{background:#c7b28f;cursor:not-allowed}
+.swap-modal-footer{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:17px;padding-top:15px;border-top:1px solid var(--line)}
+@media(max-width:980px){
+  .plan-meal{grid-template-columns:80px 70px minmax(150px,1fr) 78px repeat(2,62px) 64px}
+  .plan-meal .optional-macro{display:none}
+}
+@media(max-width:760px){
+  .plan-note-grid,.swap-option-grid{grid-template-columns:1fr}
+  .flex-meal-card{grid-template-columns:1fr 1fr}
+  .flex-meal-card>div:first-child{grid-column:1/-1}
+  .swap-macro-preview,.flex-macro-fields{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:680px){
+  .plan-meal{grid-template-columns:68px minmax(0,1fr) 60px 58px}
+  .plan-meal .plan-meal-category,.plan-meal .plan-portion{display:none}
+  .plan-meal .meal-name-wrap{grid-column:2}
+  .plan-meal .plan-macro{grid-row:auto;grid-column:3}
+  .plan-meal .plan-macro:not(.calorie-macro){display:none}
+  .swap-meal-button{grid-column:4;grid-row:1}
+  .dashboard-meal{grid-template-columns:72px minmax(0,1fr) auto}
+  .dashboard-meal .meal-macros{grid-column:2;text-align:left}
+  .dashboard-swap-button{grid-column:3;grid-row:1/3}
+  .swap-dialog{width:calc(100% - 12px);max-height:calc(100vh - 12px)}
+  .swap-modal{padding:19px;border-radius:19px;max-height:calc(100vh - 12px)}
+  .swap-modal-footer{align-items:flex-start;flex-direction:column}
+}

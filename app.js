@@ -67,6 +67,12 @@ const CATEGORY_ICONS = {
   Snack: "◇"
 };
 
+const MEAL_SWAP_STORAGE_KEY = "med-cut-meal-swaps-v1";
+const FLEX_MEAL_CAPS = [750, 750, 700, 700, 650, 650, 600, 600, 550, 550, 500, 500, 500];
+const SWAP_WINDOW_DAYS = 14;
+let activeSwapContext = null;
+
+
 let activeRecipeFilter = "All";
 let recipeSearchTerm = "";
 
@@ -75,10 +81,10 @@ function getRecipesByCategory(category) {
 }
 
 function getDailyRecipes(dayIndex) {
-  const planDay = MEAL_PLAN[clamp(dayIndex, 0, MEAL_PLAN.length - 1)];
+  const planDay = getEffectiveDay(MEAL_PLAN[clamp(dayIndex, 0, MEAL_PLAN.length - 1)]);
   return planDay.meals.map(meal => ({
-    ...RECIPES.find(recipe => recipe.id === meal.recipeId),
-    planned: meal
+    ...meal,
+    recipe: meal.recipeId ? RECIPES.find(recipe => recipe.id === meal.recipeId) : null
   }));
 }
 
@@ -215,24 +221,362 @@ function currentProgramDayIndex() {
   return clamp(daysBetween(localDay(), parseLocalDate(PROGRAM.startDate)), 0, PROGRAM.totalDays - 1);
 }
 
-function planMealMarkup(meal) {
+
+function roundMacro(value) {
+  return Math.round(Number(value) * 10) / 10;
+}
+
+function getMealSwaps() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(MEAL_SWAP_STORAGE_KEY) || "{}");
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (_) {
+    return {};
+  }
+}
+
+function saveMealSwaps(swaps) {
+  localStorage.setItem(MEAL_SWAP_STORAGE_KEY, JSON.stringify(swaps));
+}
+
+function mealSwapKey(date, slotIndex) {
+  return `${date}|${slotIndex}`;
+}
+
+function getMealSwap(date, slotIndex) {
+  return getMealSwaps()[mealSwapKey(date, slotIndex)] || null;
+}
+
+function swapWindowEnd() {
+  const end = localDay();
+  end.setDate(end.getDate() + SWAP_WINDOW_DAYS);
+  return end;
+}
+
+function canSwapDate(isoDate) {
+  const date = parseLocalDate(isoDate);
+  const today = localDay();
+  const end = swapWindowEnd();
+  const programStart = parseLocalDate(PROGRAM.startDate);
+  const programEnd = parseLocalDate(MEAL_PLAN[MEAL_PLAN.length - 1].date);
+  return date >= today && date <= end && date >= programStart && date <= programEnd;
+}
+
+function flexMealCapForWeek(week) {
+  return FLEX_MEAL_CAPS[clamp(Number(week), 1, 13) - 1];
+}
+
+function nutritionForRecipe(recipe, portion) {
+  return {
+    calories: Math.round(recipe.calories * portion),
+    protein: roundMacro(recipe.protein * portion),
+    carbs: roundMacro(recipe.carbs * portion),
+    fat: roundMacro(recipe.fat * portion),
+    fiber: roundMacro(recipe.fiber * portion)
+  };
+}
+
+function getEffectiveMeal(day, slotIndex) {
+  const base = day.meals[slotIndex];
+  const swap = getMealSwap(day.date, slotIndex);
+  if (!swap) return { ...base, isSubstitution: false, swapType: null };
+
+  if (swap.type === "recipe") {
+    const recipe = RECIPES.find(item => item.id === swap.recipeId);
+    if (!recipe) return { ...base, isSubstitution: false, swapType: null };
+    const portion = Number(swap.portion) || base.portion || 1;
+    return {
+      ...base,
+      recipeId: recipe.id,
+      name: recipe.name,
+      portion,
+      ...nutritionForRecipe(recipe, portion),
+      isSubstitution: true,
+      swapType: "recipe"
+    };
+  }
+
+  if (swap.type === "flex") {
+    return {
+      ...base,
+      recipeId: null,
+      name: swap.name || "Weekly Cheat / Flex Meal",
+      portion: 1,
+      calories: Number(swap.calories),
+      protein: roundMacro(swap.protein),
+      carbs: roundMacro(swap.carbs),
+      fat: roundMacro(swap.fat),
+      fiber: roundMacro(swap.fiber),
+      isSubstitution: true,
+      swapType: "flex"
+    };
+  }
+
+  return { ...base, isSubstitution: false, swapType: null };
+}
+
+function calculateMealTotals(meals) {
+  return ["calories", "protein", "carbs", "fat", "fiber"].reduce((totals, key) => {
+    const value = meals.reduce((sum, meal) => sum + Number(meal[key] || 0), 0);
+    totals[key] = key === "calories" ? Math.round(value) : roundMacro(value);
+    return totals;
+  }, {});
+}
+
+function getEffectiveDay(day) {
+  const meals = day.meals.map((_, slotIndex) => getEffectiveMeal(day, slotIndex));
+  return { ...day, meals, totals: calculateMealTotals(meals) };
+}
+
+function getFlexSwapForWeek(week, excludingKey = null) {
+  const swaps = getMealSwaps();
+  for (const [key, swap] of Object.entries(swaps)) {
+    if (key === excludingKey || !swap || swap.type !== "flex") continue;
+    const [date, slotText] = key.split("|");
+    const day = MEAL_PLAN.find(item => item.date === date);
+    if (day && day.week === Number(week)) {
+      const slotIndex = Number(slotText);
+      return { key, day, slotIndex, swap };
+    }
+  }
+  return null;
+}
+
+function replaceMealSwap(date, slotIndex, swap) {
+  const swaps = getMealSwaps();
+  swaps[mealSwapKey(date, slotIndex)] = swap;
+  saveMealSwaps(swaps);
+}
+
+function removeMealSwap(date, slotIndex) {
+  const swaps = getMealSwaps();
+  delete swaps[mealSwapKey(date, slotIndex)];
+  saveMealSwaps(swaps);
+}
+
+function refreshMealViews() {
+  renderProgramDay();
+  renderPlanWeek(activePlanWeek);
+}
+
+function swapWindowLabel() {
+  const today = localDay();
+  const end = swapWindowEnd();
+  const programEnd = parseLocalDate(MEAL_PLAN[MEAL_PLAN.length - 1].date);
+  const visibleEnd = end < programEnd ? end : programEnd;
+  return `${today.toLocaleDateString(undefined, { month: "short", day: "numeric" })}–${visibleEnd.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
+}
+
+function recipeOptionsForSwap(day, baseMeal, currentMeal) {
+  const usedThisWeek = new Set(
+    MEAL_PLAN
+      .filter(item => item.week === day.week)
+      .flatMap(item => item.meals)
+      .filter(item => item.category === baseMeal.category)
+      .map(item => item.recipeId)
+  );
+
+  return RECIPES
+    .filter(recipe => recipe.category === baseMeal.category)
+    .sort((a, b) => {
+      const aWeek = usedThisWeek.has(a.id) ? 0 : 1;
+      const bWeek = usedThisWeek.has(b.id) ? 0 : 1;
+      return aWeek - bWeek || a.name.localeCompare(b.name);
+    })
+    .map(recipe => ({ recipe, usedThisWeek: usedThisWeek.has(recipe.id), selected: recipe.id === currentMeal.recipeId }));
+}
+
+function updateRecipeSwapPreview() {
+  const recipe = RECIPES.find(item => item.id === document.getElementById("swapRecipeSelect").value);
+  const portion = Number(document.getElementById("swapPortionSelect").value);
+  if (!recipe || !Number.isFinite(portion)) return;
+  const nutrition = nutritionForRecipe(recipe, portion);
+  document.getElementById("swapRecipePreview").innerHTML = [
+    ["Calories", nutrition.calories],
+    ["Protein", `${nutrition.protein}g`],
+    ["Carbs", `${nutrition.carbs}g`],
+    ["Fat", `${nutrition.fat}g`],
+    ["Fiber", `${nutrition.fiber}g`]
+  ].map(([label, value]) => `<div><span>${label}</span><strong>${value}</strong></div>`).join("");
+}
+
+function openSwapDialog(date, slotIndex) {
+  const day = MEAL_PLAN.find(item => item.date === date);
+  if (!day || !day.meals[slotIndex]) return;
+  activeSwapContext = { day, slotIndex };
+
+  const baseMeal = day.meals[slotIndex];
+  const currentMeal = getEffectiveMeal(day, slotIndex);
+  const existingSwap = getMealSwap(date, slotIndex);
+  const editable = canSwapDate(date);
+  const cap = flexMealCapForWeek(day.week);
+  const contextKey = mealSwapKey(date, slotIndex);
+  const flexUsedElsewhere = getFlexSwapForWeek(day.week, contextKey);
+
+  document.getElementById("swapDialogTitle").textContent = `${baseMeal.category} on ${formatDate(date, { weekday: "long", month: "long", day: "numeric" })}`;
+  document.getElementById("swapDialogSubtitle").textContent = `${baseMeal.time} · Week ${day.week} · swaps are available through 14 days ahead`;
+  document.getElementById("swapCurrentMeal").textContent = currentMeal.name;
+  document.getElementById("swapCurrentMacros").textContent = `${currentMeal.calories} cal · ${currentMeal.protein}g protein · ${currentMeal.carbs}g carbs · ${currentMeal.fat}g fat`;
+
+  const options = recipeOptionsForSwap(day, baseMeal, currentMeal);
+  const select = document.getElementById("swapRecipeSelect");
+  select.innerHTML = options.map(({ recipe, usedThisWeek, selected }) =>
+    `<option value="${recipe.id}" ${selected ? "selected" : ""}>${recipe.name} — ${recipe.calories} cal${usedThisWeek ? " · used this week" : ""}</option>`
+  ).join("");
+  if (![...select.options].some(option => option.selected) && select.options.length) select.selectedIndex = 0;
+
+  const portionSelect = document.getElementById("swapPortionSelect");
+  const preferredPortion = existingSwap && existingSwap.type === "recipe" ? Number(existingSwap.portion) : Number(baseMeal.portion || 1);
+  portionSelect.value = [0.75, 1, 1.25, 1.5].includes(preferredPortion) ? String(preferredPortion) : "1";
+  updateRecipeSwapPreview();
+
+  document.getElementById("flexMealCapHeading").textContent = `Up to ${cap} calories`;
+  document.getElementById("flexCalories").max = cap;
+  document.getElementById("flexCalories").value = existingSwap && existingSwap.type === "flex" ? existingSwap.calories : cap;
+  document.getElementById("flexMealName").value = existingSwap && existingSwap.type === "flex" ? existingSwap.name : "";
+  document.getElementById("flexProtein").value = existingSwap && existingSwap.type === "flex" ? existingSwap.protein : "";
+  document.getElementById("flexCarbs").value = existingSwap && existingSwap.type === "flex" ? existingSwap.carbs : "";
+  document.getElementById("flexFat").value = existingSwap && existingSwap.type === "flex" ? existingSwap.fat : "";
+  document.getElementById("flexFiber").value = existingSwap && existingSwap.type === "flex" ? existingSwap.fiber : "";
+  document.getElementById("flexMealMessage").textContent = "";
+
+  const flexStatus = document.getElementById("flexMealStatus");
+  const flexSave = document.getElementById("saveFlexSwap");
+  if (flexUsedElsewhere) {
+    flexStatus.textContent = "Already used";
+    flexSave.disabled = true;
+    document.getElementById("flexMealMessage").textContent = `This week's flex meal is on ${formatDate(flexUsedElsewhere.day.date, { weekday: "short", month: "short", day: "numeric" })} at ${flexUsedElsewhere.day.meals[flexUsedElsewhere.slotIndex].time}. Restore that meal first to move it.`;
+  } else {
+    flexStatus.textContent = existingSwap && existingSwap.type === "flex" ? "Editing" : "Available";
+    flexSave.disabled = !editable;
+  }
+
+  document.getElementById("saveRecipeSwap").disabled = !editable;
+  document.getElementById("restoreScheduledMeal").classList.toggle("hidden", !existingSwap);
+  document.getElementById("restoreScheduledMeal").disabled = !editable;
+  document.getElementById("swapLockMessage").textContent = editable
+    ? `Editable window: ${swapWindowLabel()}`
+    : `This meal is locked. You can edit today through ${swapWindowEnd().toLocaleDateString(undefined, { month: "long", day: "numeric" })}.`;
+
+  const dialog = document.getElementById("swapDialog");
+  document.body.classList.add("modal-open");
+  if (typeof dialog.showModal === "function") dialog.showModal();
+  else dialog.setAttribute("open", "");
+}
+
+function closeSwapDialog() {
+  const dialog = document.getElementById("swapDialog");
+  document.body.classList.remove("modal-open");
+  if (typeof dialog.close === "function" && dialog.open) dialog.close();
+  else dialog.removeAttribute("open");
+  activeSwapContext = null;
+}
+
+function saveSelectedRecipeSwap() {
+  if (!activeSwapContext) return;
+  const { day, slotIndex } = activeSwapContext;
+  if (!canSwapDate(day.date)) return;
+  const recipeId = document.getElementById("swapRecipeSelect").value;
+  const portion = Number(document.getElementById("swapPortionSelect").value);
+  if (!RECIPES.some(recipe => recipe.id === recipeId) || !Number.isFinite(portion)) return;
+  replaceMealSwap(day.date, slotIndex, { type: "recipe", recipeId, portion, updatedAt: new Date().toISOString() });
+  closeSwapDialog();
+  refreshMealViews();
+}
+
+function saveWeeklyFlexSwap() {
+  if (!activeSwapContext) return;
+  const { day, slotIndex } = activeSwapContext;
+  if (!canSwapDate(day.date)) return;
+  const currentKey = mealSwapKey(day.date, slotIndex);
+  const existing = getFlexSwapForWeek(day.week, currentKey);
+  const message = document.getElementById("flexMealMessage");
+  if (existing) {
+    message.textContent = "This week's flex meal is already assigned to another meal.";
+    return;
+  }
+
+  const cap = flexMealCapForWeek(day.week);
+  const name = document.getElementById("flexMealName").value.trim() || "Weekly Cheat / Flex Meal";
+  const calories = Number(document.getElementById("flexCalories").value);
+  const protein = Number(document.getElementById("flexProtein").value);
+  const carbs = Number(document.getElementById("flexCarbs").value);
+  const fat = Number(document.getElementById("flexFat").value);
+  const fiber = Number(document.getElementById("flexFiber").value);
+  const values = [calories, protein, carbs, fat, fiber];
+
+  if (!values.every(Number.isFinite) || calories < 100 || calories > cap || [protein, carbs, fat, fiber].some(value => value < 0)) {
+    message.textContent = `Enter label nutrition for every field and keep calories between 100 and the ${cap}-calorie weekly cap.`;
+    return;
+  }
+
+  replaceMealSwap(day.date, slotIndex, {
+    type: "flex",
+    name,
+    calories: Math.round(calories),
+    protein: roundMacro(protein),
+    carbs: roundMacro(carbs),
+    fat: roundMacro(fat),
+    fiber: roundMacro(fiber),
+    updatedAt: new Date().toISOString()
+  });
+  closeSwapDialog();
+  refreshMealViews();
+}
+
+function restoreOriginalMeal() {
+  if (!activeSwapContext) return;
+  const { day, slotIndex } = activeSwapContext;
+  if (!canSwapDate(day.date)) return;
+  removeMealSwap(day.date, slotIndex);
+  closeSwapDialog();
+  refreshMealViews();
+}
+
+function bindMealSwaps() {
+  document.getElementById("swapRecipeSelect").addEventListener("change", updateRecipeSwapPreview);
+  document.getElementById("swapPortionSelect").addEventListener("change", updateRecipeSwapPreview);
+  document.getElementById("saveRecipeSwap").addEventListener("click", saveSelectedRecipeSwap);
+  document.getElementById("saveFlexSwap").addEventListener("click", saveWeeklyFlexSwap);
+  document.getElementById("restoreScheduledMeal").addEventListener("click", restoreOriginalMeal);
+  document.getElementById("closeSwapDialog").addEventListener("click", closeSwapDialog);
+  document.getElementById("swapDialog").addEventListener("click", event => {
+    if (event.target === event.currentTarget) closeSwapDialog();
+  });
+  document.getElementById("swapDialog").addEventListener("cancel", event => {
+    event.preventDefault();
+    closeSwapDialog();
+  });
+  document.getElementById("swapWindowNote").innerHTML = `<strong>Swap window:</strong> meals can be changed from today through 14 days ahead (${swapWindowLabel()}). Past meals and later weeks stay locked until they enter the window.`;
+}
+
+function planMealMarkup(day, meal, slotIndex) {
+  const editable = canSwapDate(day.date);
+  const badge = meal.isSubstitution
+    ? `<span class="swap-badge ${meal.swapType === "flex" ? "flex" : ""}">${meal.swapType === "flex" ? "Weekly flex meal" : "Substituted"}</span>`
+    : "";
+  const nameControl = meal.recipeId
+    ? `<button class="plan-meal-name" data-open-recipe="${meal.recipeId}">${meal.name}</button>`
+    : `<div class="plan-meal-name">${meal.name}</div>`;
   return `
-    <div class="plan-meal">
+    <div class="plan-meal ${meal.isSubstitution ? "swapped" : ""} ${meal.swapType === "flex" ? "flex-swapped" : ""}">
       <div class="plan-meal-time">${meal.time}</div>
       <div class="plan-meal-category">${meal.category}</div>
-      <button class="plan-meal-name" data-open-recipe="${meal.recipeId}">${meal.name}</button>
-      <div class="plan-portion">${portionLabel(meal.portion)}</div>
+      <div class="meal-name-wrap">${nameControl}${badge}</div>
+      <div class="plan-portion">${meal.swapType === "flex" ? "1 flex meal" : portionLabel(meal.portion)}</div>
       <div class="plan-macro calorie-macro"><small>Calories</small>${meal.calories}</div>
       <div class="plan-macro"><small>Protein</small>${meal.protein}g</div>
       <div class="plan-macro optional-macro"><small>Carbs</small>${meal.carbs}g</div>
       <div class="plan-macro optional-macro"><small>Fat</small>${meal.fat}g</div>
+      <button class="swap-meal-button" data-swap-date="${day.date}" data-swap-slot="${slotIndex}" ${editable ? "" : "disabled"} title="${editable ? "Substitute this meal" : "Meal substitutions are available from today through 14 days ahead"}">${meal.isSubstitution ? "Change" : editable ? "Swap" : "Locked"}</button>
     </div>
   `;
 }
 
 function renderPlanWeek(weekNumber) {
   activePlanWeek = clamp(Number(weekNumber), 1, 13);
-  const days = MEAL_PLAN.filter(day => day.week === activePlanWeek);
+  const sourceDays = MEAL_PLAN.filter(day => day.week === activePlanWeek);
+  const days = sourceDays.map(getEffectiveDay);
   const currentIndex = currentProgramDayIndex();
   const currentWeek = MEAL_PLAN[currentIndex].week;
 
@@ -259,6 +603,22 @@ function renderPlanWeek(weekNumber) {
     <div class="week-summary-stat"><span>Target protein</span><strong>${first.targetProtein}g</strong></div>
   `;
 
+  const flexUse = getFlexSwapForWeek(activePlanWeek);
+  const cap = flexMealCapForWeek(activePlanWeek);
+  const weekHasEditableMeal = sourceDays.some(day => canSwapDate(day.date));
+  document.getElementById("weekFlexCard").innerHTML = `
+    <div>
+      <p class="eyebrow">Weekly cheat / flex meal</p>
+      <h2>One flexible meal for Week ${activePlanWeek}</h2>
+      <p class="muted">Replace any unlocked meal, stay at or below the calorie cap, and enter label macros for accurate daily totals.</p>
+    </div>
+    <div class="flex-card-cap"><span>Calorie cap</span><strong>${cap} calories</strong></div>
+    <div class="flex-card-status ${flexUse ? "used" : weekHasEditableMeal ? "" : "locked"}">
+      <span>Status</span>
+      <strong>${flexUse ? `Used ${formatDate(flexUse.day.date, { month: "short", day: "numeric" })}` : weekHasEditableMeal ? "Available" : "Outside swap window"}</strong>
+    </div>
+  `;
+
   document.getElementById("weekDays").innerHTML = days.map(day => {
     const isToday = day.day === currentIndex + 1;
     const calorieDifference = day.totals.calories - day.targetCalories;
@@ -272,12 +632,12 @@ function renderPlanWeek(weekNumber) {
             <div class="plan-day-number">${day.day}</div>
             <div>
               <h3>${formatDate(day.date, { weekday: "long", month: "long", day: "numeric" })}${isToday ? " · Today" : ""}</h3>
-              <p>Day ${day.day} of 90</p>
+              <p>Day ${day.day} of 90${canSwapDate(day.date) ? " · swaps unlocked" : ""}</p>
             </div>
           </div>
           <div class="day-target"><strong>${day.targetCalories.toLocaleString()} cal target</strong><span>${day.targetProtein}g protein target</span></div>
         </header>
-        <div class="plan-meals">${day.meals.map(planMealMarkup).join("")}</div>
+        <div class="plan-meals">${day.meals.map((meal, slotIndex) => planMealMarkup(day, meal, slotIndex)).join("")}</div>
         <footer class="plan-day-total">
           <div class="plan-total-label"><strong>Daily total</strong><span>${differenceLabel}</span></div>
           <div class="plan-total-value calorie-total"><small>Calories</small>${day.totals.calories.toLocaleString()}</div>
@@ -292,6 +652,9 @@ function renderPlanWeek(weekNumber) {
 
   document.querySelectorAll("#weekDays [data-open-recipe]").forEach(button => {
     button.addEventListener("click", () => openRecipe(button.dataset.openRecipe));
+  });
+  document.querySelectorAll("#weekDays [data-swap-date]").forEach(button => {
+    button.addEventListener("click", () => openSwapDialog(button.dataset.swapDate, Number(button.dataset.swapSlot)));
   });
 }
 
@@ -451,14 +814,21 @@ function renderProgramDay() {
   document.getElementById("proteinTargetSmall").textContent = `${target.protein}g protein`;
   document.getElementById("groceryWeekHeading").textContent = `Week ${weekIndex + 1} grocery list`;
 
+  const planDay = MEAL_PLAN[dayIndex];
   const meals = getDailyRecipes(dayIndex);
-  const mealMarkup = meals.map(meal => `
-    <div class="meal recipe-clickable" data-open-recipe="${meal.id}" tabindex="0" role="button" aria-label="Open ${meal.name} recipe">
-      <div class="meal-type">${meal.planned.time}</div>
-      <button class="meal-name-button" data-open-recipe="${meal.id}">${meal.name}<span class="dashboard-portion">${portionLabel(meal.planned.portion)}</span></button>
-      <div class="meal-macros">${meal.planned.calories} cal · ${meal.planned.protein}g protein</div>
-    </div>
-  `).join("");
+  const mealMarkup = meals.map((meal, slotIndex) => {
+    const nameControl = meal.recipeId
+      ? `<button class="meal-name-button" data-open-recipe="${meal.recipeId}">${meal.name}<span class="dashboard-portion">${meal.swapType === "flex" ? "weekly flex meal" : portionLabel(meal.portion)}</span></button>`
+      : `<div class="meal-name-button static-meal-name">${meal.name}<span class="dashboard-portion">weekly flex meal</span></div>`;
+    return `
+      <div class="meal dashboard-meal ${meal.isSubstitution ? "swapped" : ""}">
+        <div class="meal-type">${meal.time}</div>
+        <div>${nameControl}${meal.isSubstitution ? `<span class="swap-badge ${meal.swapType === "flex" ? "flex" : ""}">${meal.swapType === "flex" ? "Flex meal" : "Substituted"}</span>` : ""}</div>
+        <div class="meal-macros">${meal.calories} cal · ${meal.protein}g protein</div>
+        <button class="dashboard-swap-button" data-swap-date="${planDay.date}" data-swap-slot="${slotIndex}" ${canSwapDate(planDay.date) ? "" : "disabled"}>${meal.isSubstitution ? "Change" : "Swap"}</button>
+      </div>
+    `;
+  }).join("");
 
   document.getElementById("mealList").innerHTML = mealMarkup;
   document.querySelectorAll("#mealList [data-open-recipe]").forEach(element => {
@@ -466,11 +836,9 @@ function renderProgramDay() {
       event.stopPropagation();
       openRecipe(element.dataset.openRecipe);
     });
-    if (element.classList.contains("meal")) {
-      element.addEventListener("keydown", event => {
-        if (event.key === "Enter" || event.key === " ") openRecipe(element.dataset.openRecipe);
-      });
-    }
+  });
+  document.querySelectorAll("#mealList [data-swap-date]").forEach(button => {
+    button.addEventListener("click", () => openSwapDialog(button.dataset.swapDate, Number(button.dataset.swapSlot)));
   });
 
   document.getElementById("groceryList").innerHTML = Object.entries(groceries)
@@ -794,6 +1162,7 @@ renderProgramDay();
 renderHabits();
 bindRecipeLibrary();
 bindPlan();
+bindMealSwaps();
 bindNavigation();
 bindWeightForms();
 bindInstall();
