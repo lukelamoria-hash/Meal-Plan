@@ -102,3 +102,17 @@ The 10:00 PM daily close is used because the scheduled dinner is at 7:30 PM.
 - Discrete items show the exact fractional requirement plus a practical “buy at least” whole-item amount.
 - Flex-meal ingredients are excluded and clearly called out because the manually selected meal is unknown.
 - Cooked rice/quinoa and dry pasta retain the measurement state used in each recipe to avoid inaccurate conversion assumptions.
+
+
+## Version 14: dynamic grocery checkoffs
+
+- Every grocery-list line now has a checkbox.
+- Checked items highlight green and display a strike-through.
+- Shopping progress is shown for the selected week.
+- Checkoffs are saved separately for each week and work offline.
+- Meal swaps immediately rebuild the grocery list.
+- If a swap removes an ingredient, that ingredient disappears.
+- If a swap adds an ingredient, the new line appears unchecked.
+- If a swap changes an ingredient quantity, that line becomes unchecked because its quantity-aware identity changed.
+- Ingredients and quantities that remain unchanged keep their checked state.
+- A Reset this week button clears the selected week's grocery checkoffs.

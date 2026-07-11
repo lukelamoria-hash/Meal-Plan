@@ -405,6 +405,20 @@
 
       <div id="groceryFlexNotice" class="grocery-flex-notice hidden"></div>
 
+      <section class="card grocery-checkoff-summary">
+        <div class="grocery-checkoff-copy">
+          <div>
+            <p class="eyebrow">Shopping progress</p>
+            <h2 id="groceryCheckProgressText">0 of 0 items checked</h2>
+            <p class="muted">The list recalculates after meal swaps. A changed quantity becomes unchecked automatically.</p>
+          </div>
+          <button id="resetGroceryChecks" class="button ghost" type="button">Reset this week</button>
+        </div>
+        <div class="progress-track grocery-check-progress-track" aria-label="Grocery shopping progress">
+          <div id="groceryCheckProgressFill" class="progress-fill"></div>
+        </div>
+      </section>
+
       <section id="groceryList" class="exact-grocery-grid" aria-live="polite"></section>
 
       <section class="card grocery-method-note">

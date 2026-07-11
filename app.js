@@ -23,6 +23,7 @@ const CATEGORY_ICONS = {
 const MEAL_SWAP_STORAGE_KEY = "med-cut-meal-swaps-v1";
 const MEAL_COMPLETION_STORAGE_KEY = "med-cut-meal-completion-v1";
 const ROUTINE_COMPLETION_STORAGE_KEY = "med-cut-routine-completion-v1";
+const GROCERY_CHECK_STORAGE_KEY = "med-cut-grocery-checks-v1";
 const MEAL_DAY_CLOSE_HOUR = 22; // 10:00 PM local time
 const ROUTINE_GRACE_MINUTES = 120; // turns red two hours after its scheduled time
 const FLEX_MEAL_CAPS = [700, 700, 650, 650, 600, 600, 550, 550, 550, 750, 750, 750, 750];
@@ -517,7 +518,77 @@ function buildGroceryWeek(weekNumber) {
   };
 }
 
-function groceryCategoryMarkup(category, items) {
+function getGroceryChecks() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(GROCERY_CHECK_STORAGE_KEY) || "{}");
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (_) {
+    return {};
+  }
+}
+
+function saveGroceryChecks(checks) {
+  localStorage.setItem(GROCERY_CHECK_STORAGE_KEY, JSON.stringify(checks));
+}
+
+function groceryCheckKey(weekNumber, item) {
+  const amount = roundGroceryNumber(Number(item.amount || 0), 3);
+  const extra = item.extraAsNeeded ? "extra" : "standard";
+  return `week-${weekNumber}|${item.name}|${item.unit}|${amount}|${extra}`;
+}
+
+function isGroceryItemChecked(weekNumber, item) {
+  return getGroceryChecks()[groceryCheckKey(weekNumber, item)] === true;
+}
+
+function setGroceryItemChecked(key, checked) {
+  const checks = getGroceryChecks();
+  if (checked) checks[key] = true;
+  else delete checks[key];
+  saveGroceryChecks(checks);
+}
+
+function updateGroceryCheckProgress() {
+  const boxes = [...document.querySelectorAll("#groceryList [data-grocery-check]")];
+  const checked = boxes.filter(box => box.checked).length;
+  const total = boxes.length;
+  const percent = total ? Math.round((checked / total) * 100) : 0;
+
+  const text = document.getElementById("groceryCheckProgressText");
+  const fill = document.getElementById("groceryCheckProgressFill");
+  if (text) {
+    text.textContent = total && checked === total
+      ? `All ${total} grocery items checked`
+      : `${checked} of ${total} ${total === 1 ? "item" : "items"} checked`;
+  }
+  if (fill) fill.style.width = `${percent}%`;
+}
+
+function bindGroceryCheckoffs() {
+  document.querySelectorAll("#groceryList [data-grocery-check]").forEach(box => {
+    box.addEventListener("change", () => {
+      const key = decodeURIComponent(box.dataset.groceryKey);
+      setGroceryItemChecked(key, box.checked);
+      const row = box.closest(".exact-grocery-item");
+      if (row) row.classList.toggle("grocery-item-checked", box.checked);
+      updateGroceryCheckProgress();
+    });
+  });
+
+  updateGroceryCheckProgress();
+}
+
+function resetGroceryChecksForWeek(weekNumber) {
+  const checks = getGroceryChecks();
+  const prefix = `week-${weekNumber}|`;
+  Object.keys(checks).forEach(key => {
+    if (key.startsWith(prefix)) delete checks[key];
+  });
+  saveGroceryChecks(checks);
+  renderGroceryView(weekNumber);
+}
+
+function groceryCategoryMarkup(category, items, weekNumber) {
   if (!items.length) return "";
   return `
     <article class="card exact-grocery-group">
@@ -526,12 +597,24 @@ function groceryCategoryMarkup(category, items) {
         <span>${items.length} ${items.length === 1 ? "item" : "items"}</span>
       </div>
       <div class="exact-grocery-items">
-        ${items.map(item => `
-          <div class="exact-grocery-item">
-            <span>${displayGroceryIngredientName(item.name)}</span>
-            <strong>${formatGroceryAmount(item)}${item.extraAsNeeded ? " + extra as needed" : ""}</strong>
-          </div>
-        `).join("")}
+        ${items.map(item => {
+          const rawKey = groceryCheckKey(weekNumber, item);
+          const checked = isGroceryItemChecked(weekNumber, item);
+          return `
+            <label class="exact-grocery-item ${checked ? "grocery-item-checked" : ""}">
+              <input
+                type="checkbox"
+                class="grocery-check-input"
+                data-grocery-check
+                data-grocery-key="${encodeURIComponent(rawKey)}"
+                ${checked ? "checked" : ""}
+              />
+              <span class="grocery-check-visual" aria-hidden="true">✓</span>
+              <span class="grocery-item-name">${displayGroceryIngredientName(item.name)}</span>
+              <strong>${formatGroceryAmount(item)}${item.extraAsNeeded ? " + extra as needed" : ""}</strong>
+            </label>
+          `;
+        }).join("")}
       </div>
     </article>
   `;
@@ -606,8 +689,10 @@ function renderGroceryView(requestedWeek = activeGroceryWeek) {
   `;
 
   list.innerHTML = [...selectedData.categories.entries()]
-    .map(([category, items]) => groceryCategoryMarkup(category, items))
+    .map(([category, items]) => groceryCategoryMarkup(category, items, selectedData.week))
     .join("");
+
+  bindGroceryCheckoffs();
 
   const flexNotice = document.getElementById("groceryFlexNotice");
   if (selectedData.flexMeals.length) {
@@ -633,6 +718,11 @@ function renderGroceryView(requestedWeek = activeGroceryWeek) {
 
 function bindGroceries() {
   activeGroceryWeek = MEAL_PLAN[currentProgramDayIndex()].week;
+  document.getElementById("resetGroceryChecks").addEventListener("click", () => {
+    if (window.confirm(`Reset every grocery checkoff for Week ${activeGroceryWeek}?`)) {
+      resetGroceryChecksForWeek(activeGroceryWeek);
+    }
+  });
   renderGroceryView(activeGroceryWeek);
 }
 
