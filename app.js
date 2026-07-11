@@ -374,17 +374,13 @@ function routineForDay(day) {
 
 function routineItemMarkup(item, date, compact = false) {
   const completed = isRoutineComplete(date, item.routineKey);
-  const missed = !completed && isRoutinePastWindow(date, item.time);
+  const missed = !compact && !completed && isRoutinePastWindow(date, item.time);
   const description = item.routineType === "coffee"
     ? "Plain black coffee · 0 calories"
     : "1 bottle (340 mL)";
-  return `
-    <div
-      class="routine-item ${compact ? "compact" : ""} ${completed ? "routine-completed" : ""} ${missed ? "routine-missed" : ""}"
-      data-routine-date="${date}"
-      data-routine-key="${item.routineKey}"
-      data-routine-time="${item.time}"
-    >
+  const checkControl = compact
+    ? ""
+    : `
       <label class="meal-check-wrap routine-check-wrap" title="Mark this routine item complete">
         <input
           type="checkbox"
@@ -395,7 +391,16 @@ function routineItemMarkup(item, date, compact = false) {
           ${completed ? "checked" : ""}
         />
         <span class="meal-check-visual" aria-hidden="true">✓</span>
-      </label>
+      </label>`;
+  return `
+    <div
+      class="routine-item ${compact ? "compact routine-status-only" : ""} ${completed ? "routine-completed" : ""} ${missed ? "routine-missed" : ""}"
+      data-routine-date="${date}"
+      data-routine-key="${item.routineKey}"
+      data-routine-time="${item.time}"
+      data-routine-passive="${compact ? "true" : "false"}"
+    >
+      ${checkControl}
       <div class="routine-time">${item.time}</div>
       <div class="routine-main">
         <strong>${item.name}</strong>
@@ -498,8 +503,9 @@ function refreshRoutineCompletionStates() {
     const date = row.dataset.routineDate;
     const routineKey = row.dataset.routineKey;
     const scheduledTime = row.dataset.routineTime || "11:59 PM";
+    const passive = row.dataset.routinePassive === "true";
     const completed = isRoutineComplete(date, routineKey);
-    const missed = !completed && isRoutinePastWindow(date, scheduledTime);
+    const missed = !passive && !completed && isRoutinePastWindow(date, scheduledTime);
     const checkbox = row.querySelector("[data-routine-complete]");
 
     row.classList.toggle("routine-completed", completed);
@@ -557,23 +563,35 @@ function isMealPastDailyClose(isoDate, now = new Date()) {
   return now.getHours() >= MEAL_DAY_CLOSE_HOUR;
 }
 
+function isMealPastScheduledTime(isoDate, scheduledTime, now = new Date()) {
+  const mealDate = parseLocalDate(isoDate);
+  const today = localDay(now);
+
+  if (mealDate.getTime() < today.getTime()) return true;
+  if (mealDate.getTime() > today.getTime()) return false;
+
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  return currentMinutes >= timeToMinutes(scheduledTime);
+}
+
 function refreshDashboardMealCompletionStates() {
   const rows = [...document.querySelectorAll("#mealList [data-meal-date][data-meal-slot]")];
   const status = document.getElementById("mealCompletionStatus");
   if (!rows.length || !status) return;
 
   let completedCount = 0;
-  let missedCount = 0;
+  let overdueCount = 0;
 
   rows.forEach(row => {
     const date = row.dataset.mealDate;
     const slotIndex = Number(row.dataset.mealSlot);
+    const scheduledTime = row.dataset.mealTime || "11:59 PM";
     const completed = isMealComplete(date, slotIndex);
-    const missed = !completed && isMealPastDailyClose(date);
+    const overdue = !completed && isMealPastScheduledTime(date, scheduledTime);
     const checkbox = row.querySelector("[data-meal-complete]");
 
     row.classList.toggle("meal-completed", completed);
-    row.classList.toggle("meal-missed", missed);
+    row.classList.toggle("meal-missed", overdue);
 
     if (checkbox) {
       checkbox.checked = completed;
@@ -581,19 +599,19 @@ function refreshDashboardMealCompletionStates() {
     }
 
     if (completed) completedCount += 1;
-    if (missed) missedCount += 1;
+    if (overdue) overdueCount += 1;
   });
 
   const total = rows.length;
   if (completedCount === total) {
     status.className = "meal-completion-status all-complete";
     status.textContent = `All ${total} meals completed today. Nice work.`;
-  } else if (missedCount > 0) {
+  } else if (overdueCount > 0) {
     status.className = "meal-completion-status has-missed";
-    status.textContent = `${completedCount} of ${total} completed · ${missedCount} missed after the 10:00 PM daily close.`;
+    status.textContent = `${completedCount} of ${total} completed · ${overdueCount} currently overdue.`;
   } else {
     status.className = "meal-completion-status";
-    status.textContent = `${completedCount} of ${total} meals completed · unchecked meals turn red at 10:00 PM.`;
+    status.textContent = `${completedCount} of ${total} meals completed · each meal turns red after its scheduled time.`;
   }
 }
 
@@ -620,36 +638,14 @@ function refreshPlanMealCompletionStates() {
     const date = row.dataset.planMealDate;
     const slotIndex = Number(row.dataset.planMealSlot);
     const completed = isMealComplete(date, slotIndex);
-    const missed = !completed && isMealPastDailyClose(date);
-    const checkbox = row.querySelector("[data-plan-meal-complete]");
 
     row.classList.toggle("meal-completed", completed);
-    row.classList.toggle("meal-missed", missed);
-
-    if (checkbox) {
-      checkbox.checked = completed;
-      checkbox.setAttribute(
-        "aria-label",
-        completed ? "Meal completed" : "Mark meal as completed"
-      );
-    }
+    row.classList.remove("meal-missed");
   });
 }
 
 function bindPlanMealCompletion() {
-  document.querySelectorAll("#weekDays [data-plan-meal-complete]").forEach(checkbox => {
-    checkbox.addEventListener("click", event => event.stopPropagation());
-    checkbox.addEventListener("change", () => {
-      setMealComplete(
-        checkbox.dataset.mealDate,
-        Number(checkbox.dataset.mealSlot),
-        checkbox.checked
-      );
-      refreshPlanMealCompletionStates();
-      refreshDashboardMealCompletionStates();
-    });
-  });
-
+  // The 13-week plan is status-only. Checkoffs are made on the dashboard.
   refreshPlanMealCompletionStates();
 }
 
@@ -968,7 +964,6 @@ function bindMealSwaps() {
 function planMealMarkup(day, meal, slotIndex) {
   const editable = canSwapDate(day.date);
   const completed = isMealComplete(day.date, slotIndex);
-  const missed = !completed && isMealPastDailyClose(day.date);
   const badge = meal.isSubstitution
     ? `<span class="swap-badge ${meal.swapType === "flex" ? "flex" : ""}">${meal.swapType === "flex" ? "Weekly flex meal" : "Substituted"}</span>`
     : "";
@@ -977,21 +972,10 @@ function planMealMarkup(day, meal, slotIndex) {
     : `<div class="plan-meal-name">${meal.name}</div>`;
   return `
     <div
-      class="plan-meal ${meal.isSubstitution ? "swapped" : ""} ${meal.swapType === "flex" ? "flex-swapped" : ""} ${completed ? "meal-completed" : ""} ${missed ? "meal-missed" : ""}"
+      class="plan-meal plan-status-only ${meal.isSubstitution ? "swapped" : ""} ${meal.swapType === "flex" ? "flex-swapped" : ""} ${completed ? "meal-completed" : ""}"
       data-plan-meal-date="${day.date}"
       data-plan-meal-slot="${slotIndex}"
     >
-      <label class="meal-check-wrap plan-meal-check-wrap" title="Mark this meal as eaten">
-        <input
-          type="checkbox"
-          class="meal-check"
-          data-plan-meal-complete
-          data-meal-date="${day.date}"
-          data-meal-slot="${slotIndex}"
-          ${completed ? "checked" : ""}
-        />
-        <span class="meal-check-visual" aria-hidden="true">✓</span>
-      </label>
       <div class="plan-meal-time">${meal.time}</div>
       <div class="plan-meal-category">${meal.category}</div>
       <div class="meal-name-wrap">${nameControl}${badge}</div>
@@ -1389,12 +1373,13 @@ function renderProgramDay() {
       ? `<button class="meal-name-button" data-open-recipe="${meal.recipeId}" data-recipe-portion="${meal.portion}">${meal.name}<span class="dashboard-portion">${meal.swapType === "flex" ? "weekly flex meal" : portionLabel(meal.portion)}</span></button>`
       : `<div class="meal-name-button static-meal-name">${meal.name}<span class="dashboard-portion">weekly flex meal</span></div>`;
     const completed = isMealComplete(planDay.date, slotIndex);
-    const missed = !completed && isMealPastDailyClose(planDay.date);
+    const missed = !completed && isMealPastScheduledTime(planDay.date, meal.time);
     return `
       <div
         class="meal dashboard-meal ${meal.isSubstitution ? "swapped" : ""} ${completed ? "meal-completed" : ""} ${missed ? "meal-missed" : ""}"
         data-meal-date="${planDay.date}"
         data-meal-slot="${slotIndex}"
+        data-meal-time="${meal.time}"
       >
         <label class="meal-check-wrap" title="Mark this meal as eaten">
           <input

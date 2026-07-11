@@ -814,3 +814,48 @@ body.modal-open{overflow:hidden}
     align-self:center;
   }
 }
+
+
+/* Version 12: dashboard-timed overdue meals and status-only 13-week plan */
+.plan-status-only.meal-missed,
+.plan-routine .routine-status-only.routine-missed{
+  background:inherit;
+  border-color:transparent;
+  box-shadow:none;
+}
+
+.plan-routine .routine-status-only{
+  grid-template-columns:82px minmax(0,1fr) auto auto;
+}
+
+.plan-status-only.meal-completed,
+.plan-routine .routine-status-only.routine-completed{
+  background:#e7f4e9;
+  border-color:#9dc9a5;
+  box-shadow:inset 4px 0 0 #2e7d45;
+}
+
+@media(max-width:760px){
+  .plan-routine .routine-status-only{
+    grid-template-columns:68px minmax(0,1fr) auto;
+    gap:9px;
+  }
+  .plan-routine .routine-status-only .routine-time{
+    grid-column:1;
+    grid-row:1;
+  }
+  .plan-routine .routine-status-only .routine-main{
+    grid-column:2;
+    grid-row:1;
+  }
+  .plan-routine .routine-status-only .routine-macros{
+    grid-column:2;
+    grid-row:2;
+    text-align:left;
+  }
+  .plan-routine .routine-status-only .locked-badge{
+    grid-column:3;
+    grid-row:1/3;
+    align-self:center;
+  }
+}

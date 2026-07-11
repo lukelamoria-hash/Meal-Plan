@@ -78,3 +78,14 @@ The 10:00 PM daily close is used because the scheduled dinner is at 7:30 PM.
 - An unchecked routine item turns red two hours after its scheduled time.
 - Checking it later still changes it from red to green.
 - Black coffee contributes zero calories; the two shakes still contribute 300 calories and 60g protein daily.
+
+
+## Version 12: status-only plan and timed dashboard alerts
+
+- The 13-week plan no longer shows meal, coffee, or shake checkboxes.
+- That tab is read-only for completion status: completed items highlight green.
+- Unchecked items in the 13-week plan remain neutral instead of turning red.
+- Checkoffs are made from the dashboard only.
+- Dashboard meals turn red as soon as their individual scheduled time has passed.
+- Checking an overdue meal immediately changes it from red to green.
+- Coffee and shake dashboard checkoffs retain their existing scheduled-time behavior.
