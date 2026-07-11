@@ -4,19 +4,19 @@ const PROGRAM = {
   startWeight: 178,
   goalWeight: 155,
   weeklyTargets: [
-    { calories: 2100, protein: 185 },
-    { calories: 2100, protein: 185 },
-    { calories: 2000, protein: 185 },
-    { calories: 2000, protein: 185 },
-    { calories: 1900, protein: 185 },
-    { calories: 1900, protein: 185 },
-    { calories: 1800, protein: 185 },
-    { calories: 1800, protein: 185 },
-    { calories: 1700, protein: 180 },
-    { calories: 1700, protein: 180 },
-    { calories: 1650, protein: 180 },
-    { calories: 1650, protein: 180 },
-    { calories: 1600, protein: 180 }
+    { calories: 2100, protein: 175 },
+    { calories: 2100, protein: 170 },
+    { calories: 2000, protein: 180 },
+    { calories: 2000, protein: 180 },
+    { calories: 1900, protein: 175 },
+    { calories: 1900, protein: 175 },
+    { calories: 1800, protein: 160 },
+    { calories: 1800, protein: 165 },
+    { calories: 1700, protein: 150 },
+    { calories: 1700, protein: 150 },
+    { calories: 1650, protein: 150 },
+    { calories: 1650, protein: 145 },
+    { calories: 1600, protein: 140 }
   ]
 };
 
@@ -75,16 +75,11 @@ function getRecipesByCategory(category) {
 }
 
 function getDailyRecipes(dayIndex) {
-  const breakfasts = getRecipesByCategory("Breakfast");
-  const lunches = getRecipesByCategory("Lunch");
-  const dinners = getRecipesByCategory("Dinner");
-  const snacks = getRecipesByCategory("Snack");
-  return [
-    breakfasts[dayIndex % breakfasts.length],
-    lunches[(dayIndex * 2 + Math.floor(dayIndex / 7)) % lunches.length],
-    snacks[(dayIndex + Math.floor(dayIndex / 5)) % snacks.length],
-    dinners[(dayIndex * 3 + Math.floor(dayIndex / 7)) % dinners.length]
-  ];
+  const planDay = MEAL_PLAN[clamp(dayIndex, 0, MEAL_PLAN.length - 1)];
+  return planDay.meals.map(meal => ({
+    ...RECIPES.find(recipe => recipe.id === meal.recipeId),
+    planned: meal
+  }));
 }
 
 function recipeSearchText(recipe) {
@@ -112,6 +107,8 @@ function recipeCardMarkup(recipe) {
         <div class="recipe-card-macros">
           <div><span>Calories</span><strong>${recipe.calories}</strong></div>
           <div><span>Protein</span><strong>${recipe.protein}g</strong></div>
+          <div><span>Carbs</span><strong>${recipe.carbs}g</strong></div>
+          <div><span>Fat</span><strong>${recipe.fat}g</strong></div>
           <div><span>Fiber</span><strong>${recipe.fiber}g</strong></div>
         </div>
         <button class="recipe-open" data-open-recipe="${recipe.id}">View recipe</button>
@@ -207,6 +204,110 @@ function bindRecipeLibrary() {
   renderRecipeLibrary();
 }
 
+let activePlanWeek = 1;
+
+function portionLabel(portion) {
+  const labels = { "0.75": "¾ serving", "1": "1 serving", "1.25": "1¼ servings", "1.5": "1½ servings" };
+  return labels[String(portion)] || `${portion} servings`;
+}
+
+function currentProgramDayIndex() {
+  return clamp(daysBetween(localDay(), parseLocalDate(PROGRAM.startDate)), 0, PROGRAM.totalDays - 1);
+}
+
+function planMealMarkup(meal) {
+  return `
+    <div class="plan-meal">
+      <div class="plan-meal-time">${meal.time}</div>
+      <div class="plan-meal-category">${meal.category}</div>
+      <button class="plan-meal-name" data-open-recipe="${meal.recipeId}">${meal.name}</button>
+      <div class="plan-portion">${portionLabel(meal.portion)}</div>
+      <div class="plan-macro calorie-macro"><small>Calories</small>${meal.calories}</div>
+      <div class="plan-macro"><small>Protein</small>${meal.protein}g</div>
+      <div class="plan-macro optional-macro"><small>Carbs</small>${meal.carbs}g</div>
+      <div class="plan-macro optional-macro"><small>Fat</small>${meal.fat}g</div>
+    </div>
+  `;
+}
+
+function renderPlanWeek(weekNumber) {
+  activePlanWeek = clamp(Number(weekNumber), 1, 13);
+  const days = MEAL_PLAN.filter(day => day.week === activePlanWeek);
+  const currentIndex = currentProgramDayIndex();
+  const currentWeek = MEAL_PLAN[currentIndex].week;
+
+  document.querySelectorAll("[data-plan-week]").forEach(button => {
+    button.classList.toggle("active", Number(button.dataset.planWeek) === activePlanWeek);
+    button.classList.toggle("current", Number(button.dataset.planWeek) === currentWeek);
+  });
+
+  const first = days[0];
+  const last = days[days.length - 1];
+  const averages = ["calories", "protein", "carbs", "fat", "fiber"].reduce((result, key) => {
+    result[key] = days.reduce((sum, day) => sum + day.totals[key], 0) / days.length;
+    return result;
+  }, {});
+
+  document.getElementById("weekSummary").innerHTML = `
+    <div class="week-summary-main">
+      <p class="eyebrow">Week ${activePlanWeek}</p>
+      <h2>${formatDate(first.date, { month: "long", day: "numeric" })}–${formatDate(last.date, { month: "long", day: "numeric", year: "numeric" })}</h2>
+      <p class="muted">${days.length} planned days · ${first.targetCalories.toLocaleString()} calorie target</p>
+    </div>
+    <div class="week-summary-stat"><span>Average plan</span><strong>${Math.round(averages.calories).toLocaleString()} cal</strong></div>
+    <div class="week-summary-stat"><span>Average protein</span><strong>${averages.protein.toFixed(0)}g</strong></div>
+    <div class="week-summary-stat"><span>Target protein</span><strong>${first.targetProtein}g</strong></div>
+  `;
+
+  document.getElementById("weekDays").innerHTML = days.map(day => {
+    const isToday = day.day === currentIndex + 1;
+    const calorieDifference = day.totals.calories - day.targetCalories;
+    const differenceLabel = calorieDifference === 0
+      ? "on target"
+      : `${Math.abs(calorieDifference)} cal ${calorieDifference > 0 ? "over" : "under"} target`;
+    return `
+      <article class="card plan-day ${isToday ? "current-day" : ""}">
+        <header class="plan-day-header">
+          <div class="plan-day-title">
+            <div class="plan-day-number">${day.day}</div>
+            <div>
+              <h3>${formatDate(day.date, { weekday: "long", month: "long", day: "numeric" })}${isToday ? " · Today" : ""}</h3>
+              <p>Day ${day.day} of 90</p>
+            </div>
+          </div>
+          <div class="day-target"><strong>${day.targetCalories.toLocaleString()} cal target</strong><span>${day.targetProtein}g protein target</span></div>
+        </header>
+        <div class="plan-meals">${day.meals.map(planMealMarkup).join("")}</div>
+        <footer class="plan-day-total">
+          <div class="plan-total-label"><strong>Daily total</strong><span>${differenceLabel}</span></div>
+          <div class="plan-total-value calorie-total"><small>Calories</small>${day.totals.calories.toLocaleString()}</div>
+          <div class="plan-total-value protein-total"><small>Protein</small>${day.totals.protein}g</div>
+          <div class="plan-total-value"><small>Carbs</small>${day.totals.carbs}g</div>
+          <div class="plan-total-value optional-macro"><small>Fat</small>${day.totals.fat}g</div>
+          <div class="plan-total-value optional-macro"><small>Fiber</small>${day.totals.fiber}g</div>
+        </footer>
+      </article>
+    `;
+  }).join("");
+
+  document.querySelectorAll("#weekDays [data-open-recipe]").forEach(button => {
+    button.addEventListener("click", () => openRecipe(button.dataset.openRecipe));
+  });
+}
+
+function bindPlan() {
+  const currentWeek = MEAL_PLAN[currentProgramDayIndex()].week;
+  const selector = document.getElementById("weekSelector");
+  selector.innerHTML = Array.from({ length: 13 }, (_, index) => {
+    const week = index + 1;
+    return `<button class="week-button ${week === currentWeek ? "current" : ""}" data-plan-week="${week}">Week ${week}</button>`;
+  }).join("");
+  selector.querySelectorAll("[data-plan-week]").forEach(button => {
+    button.addEventListener("click", () => renderPlanWeek(button.dataset.planWeek));
+  });
+  renderPlanWeek(currentWeek);
+}
+
 const WEIGHT_STORAGE_KEY = "med-cut-weight-entries-v2";
 
 function parseLocalDate(iso) {
@@ -300,6 +401,9 @@ function setActiveTab(tabName) {
   if (tabName === "progress") {
     requestAnimationFrame(renderProgress);
   }
+  if (tabName === "plan") {
+    requestAnimationFrame(() => renderPlanWeek(activePlanWeek));
+  }
   if (tabName === "meals") {
     requestAnimationFrame(renderRecipeLibrary);
   }
@@ -350,9 +454,9 @@ function renderProgramDay() {
   const meals = getDailyRecipes(dayIndex);
   const mealMarkup = meals.map(meal => `
     <div class="meal recipe-clickable" data-open-recipe="${meal.id}" tabindex="0" role="button" aria-label="Open ${meal.name} recipe">
-      <div class="meal-type">${meal.category}</div>
-      <button class="meal-name-button" data-open-recipe="${meal.id}">${meal.name}</button>
-      <div class="meal-macros">${meal.calories} cal · ${meal.protein}g protein</div>
+      <div class="meal-type">${meal.planned.time}</div>
+      <button class="meal-name-button" data-open-recipe="${meal.id}">${meal.name}<span class="dashboard-portion">${portionLabel(meal.planned.portion)}</span></button>
+      <div class="meal-macros">${meal.planned.calories} cal · ${meal.planned.protein}g protein</div>
     </div>
   `).join("");
 
@@ -656,7 +760,7 @@ function bindNavigation() {
   });
 
   const requestedTab = location.hash.replace("#", "");
-  if (["dashboard", "progress", "meals", "groceries"].includes(requestedTab)) {
+  if (["dashboard", "plan", "progress", "meals", "groceries"].includes(requestedTab)) {
     setActiveTab(requestedTab);
   }
 }
@@ -689,6 +793,7 @@ function registerServiceWorker() {
 renderProgramDay();
 renderHabits();
 bindRecipeLibrary();
+bindPlan();
 bindNavigation();
 bindWeightForms();
 bindInstall();

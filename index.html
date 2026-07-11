@@ -28,6 +28,7 @@
 
   <nav id="desktopNav" class="desktop-nav" aria-label="Main navigation">
     <button class="nav-link active" data-tab-link="dashboard">Dashboard</button>
+    <button class="nav-link" data-tab-link="plan">13-Week Plan</button>
     <button class="nav-link" data-tab-link="progress">Progress</button>
     <button class="nav-link" data-tab-link="meals">Meals</button>
     <button class="nav-link" data-tab-link="groceries">Groceries</button>
@@ -99,7 +100,7 @@
             <span id="proteinTarget" class="pill"></span>
           </div>
           <div id="mealList" class="meal-list"></div>
-          <button class="text-button" data-tab-link="meals">View the meal plan →</button>
+          <button class="text-button" data-tab-link="plan">View the full 13-week plan →</button>
         </article>
 
         <article class="card">
@@ -148,6 +149,27 @@
           </div>
         </div>
       </section>
+    </section>
+
+
+    <section id="planTab" class="tab-panel" data-tab="plan">
+      <div class="page-heading plan-page-heading">
+        <div>
+          <p class="eyebrow">90-day schedule</p>
+          <h1>Weeks 1–13</h1>
+          <p class="muted">Every day includes a meal time, planned portion, calculated nutrition, and daily totals. Week 13 contains the final six days of the 90-day plan.</p>
+        </div>
+      </div>
+
+      <section class="card plan-tools">
+        <div id="weekSelector" class="week-selector" aria-label="Select a week"></div>
+        <div class="plan-source-note">
+          <strong>Nutrition calculation:</strong> recipe macros are calculated from listed ingredient weights using USDA FoodData Central reference values. Packaged foods use a fixed reference-label value, so match the listed serving or substitute your product label.
+        </div>
+      </section>
+
+      <section id="weekSummary" class="card week-summary"></section>
+      <section id="weekDays" class="week-days" aria-live="polite"></section>
     </section>
 
     <section id="progressTab" class="tab-panel" data-tab="progress">
@@ -266,7 +288,7 @@
           <button class="filter-chip" data-recipe-filter="Dinner">Dinner</button>
           <button class="filter-chip" data-recipe-filter="Snack">Snacks</button>
         </div>
-        <p class="macro-note">Nutrition values are estimates per listed serving and may vary by brand and exact portion.</p>
+        <p class="macro-note">Nutrition is calculated from the listed gram weights using USDA FoodData Central reference values. Packaged products use fixed reference-label values and should be matched to the label you buy.</p>
       </section>
 
       <div id="recipeResultsSummary" class="results-summary"></div>
@@ -323,18 +345,20 @@
         </section>
       </div>
 
-      <p class="modal-disclaimer">Macros are planning estimates. For the closest numbers, weigh ingredients and use the nutrition labels on the brands you buy.</p>
+      <p class="modal-disclaimer">Calculated nutrition uses the listed gram weights and USDA FoodData Central reference values. Packaged products can vary, so match the fixed reference serving or use your product label.</p>
     </article>
   </dialog>
 
   <nav class="mobile-nav" aria-label="Mobile navigation">
-    <button class="active" data-tab-link="dashboard"><span>⌂</span>Dashboard</button>
+    <button class="active" data-tab-link="dashboard"><span>⌂</span>Home</button>
+    <button data-tab-link="plan"><span>▦</span>Plan</button>
     <button data-tab-link="progress"><span>↗</span>Progress</button>
     <button data-tab-link="meals"><span>◉</span>Meals</button>
     <button data-tab-link="groceries"><span>✓</span>Groceries</button>
   </nav>
 
   <script src="recipes.js"></script>
+  <script src="plan.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

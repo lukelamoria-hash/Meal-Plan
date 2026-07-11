@@ -5,11 +5,11 @@ const RECIPES = [
     "name": "Apple Cinnamon Protein Oats",
     "description": "Creamy oats with apple, cinnamon, Greek yogurt, and protein powder.",
     "servings": 1,
-    "calories": 470,
-    "protein": 40,
-    "carbs": 61,
-    "fat": 10,
-    "fiber": 9,
+    "calories": 483,
+    "protein": 39.1,
+    "carbs": 56.4,
+    "fat": 12.1,
+    "fiber": 9.0,
     "prep": "5 min",
     "cook": "8 min",
     "ingredients": [
@@ -24,7 +24,7 @@ const RECIPES = [
     ],
     "steps": [
       "Add oats, almond milk, apple, cinnamon, and salt to a small saucepan.",
-      "Cook over medium heat for 5–7 minutes, stirring often, until thick and tender.",
+      "Cook over medium heat for 5\u20137 minutes, stirring often, until thick and tender.",
       "Remove from heat and let cool for 1 minute so the protein powder does not clump.",
       "Stir in protein powder and Greek yogurt until smooth.",
       "Top with walnuts and a little extra cinnamon."
@@ -32,7 +32,8 @@ const RECIPES = [
     "tags": [
       "high protein",
       "oats"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "spinach-feta-egg-pita",
@@ -40,11 +41,11 @@ const RECIPES = [
     "name": "Spinach Feta Egg Pita",
     "description": "A warm whole-wheat pita filled with eggs, spinach, tomato, and feta.",
     "servings": 1,
-    "calories": 480,
-    "protein": 38,
-    "carbs": 43,
-    "fat": 18,
-    "fiber": 7,
+    "calories": 510,
+    "protein": 38.0,
+    "carbs": 44.1,
+    "fat": 21.0,
+    "fiber": 7.1,
     "prep": "8 min",
     "cook": "10 min",
     "ingredients": [
@@ -68,7 +69,8 @@ const RECIPES = [
     "tags": [
       "pita",
       "eggs"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "greek-yogurt-granola-bowl",
@@ -76,11 +78,11 @@ const RECIPES = [
     "name": "Greek Yogurt Granola Bowl",
     "description": "Greek yogurt with banana, grapes, granola, almonds, and honey.",
     "servings": 1,
-    "calories": 455,
-    "protein": 39,
-    "carbs": 58,
-    "fat": 9,
-    "fiber": 6,
+    "calories": 548,
+    "protein": 38.3,
+    "carbs": 75.4,
+    "fat": 12.8,
+    "fiber": 7.0,
     "prep": "5 min",
     "cook": "0 min",
     "ingredients": [
@@ -101,7 +103,8 @@ const RECIPES = [
     "tags": [
       "no cook",
       "yogurt"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "mediterranean-egg-scramble",
@@ -109,11 +112,11 @@ const RECIPES = [
     "name": "Mediterranean Egg Scramble",
     "description": "Eggs and egg whites scrambled with peppers, tomatoes, spinach, olives, and feta.",
     "servings": 1,
-    "calories": 430,
-    "protein": 41,
-    "carbs": 27,
-    "fat": 18,
-    "fiber": 6,
+    "calories": 490,
+    "protein": 40.4,
+    "carbs": 29.4,
+    "fat": 23.5,
+    "fiber": 6.5,
     "prep": "8 min",
     "cook": "10 min",
     "ingredients": [
@@ -138,7 +141,8 @@ const RECIPES = [
     "tags": [
       "eggs",
       "vegetables"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "smoked-salmon-avocado-toast",
@@ -146,11 +150,11 @@ const RECIPES = [
     "name": "Smoked Salmon Avocado Toast",
     "description": "Whole-grain toast with avocado, smoked salmon, cucumber, egg, and lemon.",
     "servings": 1,
-    "calories": 500,
-    "protein": 35,
-    "carbs": 41,
-    "fat": 23,
-    "fiber": 9,
+    "calories": 474,
+    "protein": 33.5,
+    "carbs": 40.9,
+    "fat": 20.7,
+    "fiber": 9.9,
     "prep": "8 min",
     "cook": "7 min",
     "ingredients": [
@@ -173,7 +177,8 @@ const RECIPES = [
     "tags": [
       "salmon",
       "toast"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "banana-walnut-protein-oats",
@@ -181,11 +186,11 @@ const RECIPES = [
     "name": "Banana Walnut Protein Oats",
     "description": "Warm banana oats with protein powder, walnuts, and cinnamon.",
     "servings": 1,
-    "calories": 490,
-    "protein": 39,
-    "carbs": 60,
-    "fat": 12,
-    "fiber": 8,
+    "calories": 554,
+    "protein": 37.3,
+    "carbs": 74.9,
+    "fat": 13.6,
+    "fiber": 11.8,
     "prep": "5 min",
     "cook": "7 min",
     "ingredients": [
@@ -200,7 +205,7 @@ const RECIPES = [
     ],
     "steps": [
       "Combine oats, milk, half the banana, cinnamon, and salt in a saucepan.",
-      "Cook over medium heat for 5–6 minutes, stirring until creamy.",
+      "Cook over medium heat for 5\u20136 minutes, stirring until creamy.",
       "Remove from heat and rest for 1 minute.",
       "Stir in protein powder and chia seeds.",
       "Top with remaining banana and walnuts."
@@ -208,7 +213,8 @@ const RECIPES = [
     "tags": [
       "oats",
       "banana"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "tomato-feta-breakfast-wrap",
@@ -216,11 +222,11 @@ const RECIPES = [
     "name": "Tomato Feta Breakfast Wrap",
     "description": "A high-protein whole-wheat wrap with egg whites, turkey, tomato, spinach, and feta.",
     "servings": 1,
-    "calories": 465,
-    "protein": 45,
-    "carbs": 42,
-    "fat": 14,
-    "fiber": 7,
+    "calories": 477,
+    "protein": 39.1,
+    "carbs": 43.2,
+    "fat": 16.4,
+    "fiber": 6.1,
     "prep": "8 min",
     "cook": "9 min",
     "ingredients": [
@@ -243,7 +249,8 @@ const RECIPES = [
     "tags": [
       "wrap",
       "egg whites"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "mushroom-spinach-omelet",
@@ -251,11 +258,11 @@ const RECIPES = [
     "name": "Mushroom Spinach Omelet",
     "description": "A fluffy omelet with mushrooms, spinach, goat cheese, and toast.",
     "servings": 1,
-    "calories": 445,
-    "protein": 39,
-    "carbs": 34,
-    "fat": 18,
-    "fiber": 7,
+    "calories": 486,
+    "protein": 44.1,
+    "carbs": 23.8,
+    "fat": 24.0,
+    "fiber": 5.0,
     "prep": "7 min",
     "cook": "12 min",
     "ingredients": [
@@ -278,7 +285,8 @@ const RECIPES = [
     "tags": [
       "omelet",
       "vegetarian"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "orange-pistachio-yogurt-bowl",
@@ -286,11 +294,11 @@ const RECIPES = [
     "name": "Orange Pistachio Yogurt Bowl",
     "description": "Greek yogurt with orange, pistachios, oats, dates, and cinnamon.",
     "servings": 1,
-    "calories": 450,
-    "protein": 38,
-    "carbs": 56,
-    "fat": 10,
-    "fiber": 7,
+    "calories": 488,
+    "protein": 38.9,
+    "carbs": 66.1,
+    "fat": 9.9,
+    "fiber": 8.7,
     "prep": "6 min",
     "cook": "0 min",
     "ingredients": [
@@ -311,7 +319,8 @@ const RECIPES = [
     "tags": [
       "no cook",
       "citrus"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "egg-white-turkey-pita",
@@ -319,11 +328,11 @@ const RECIPES = [
     "name": "Egg White Turkey Pita",
     "description": "Egg whites, turkey, peppers, and tzatziki tucked into a warm pita.",
     "servings": 1,
-    "calories": 455,
-    "protein": 47,
-    "carbs": 46,
-    "fat": 10,
-    "fiber": 7,
+    "calories": 453,
+    "protein": 43.2,
+    "carbs": 47.7,
+    "fat": 10.5,
+    "fiber": 7.4,
     "prep": "8 min",
     "cook": "10 min",
     "ingredients": [
@@ -346,7 +355,8 @@ const RECIPES = [
     "tags": [
       "pita",
       "high protein"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "peach-cinnamon-overnight-oats",
@@ -354,11 +364,11 @@ const RECIPES = [
     "name": "Peach Cinnamon Overnight Oats",
     "description": "Chilled oats with peaches, Greek yogurt, chia, and vanilla protein.",
     "servings": 1,
-    "calories": 475,
-    "protein": 41,
-    "carbs": 62,
-    "fat": 9,
-    "fiber": 10,
+    "calories": 518,
+    "protein": 48.4,
+    "carbs": 60.2,
+    "fat": 9.6,
+    "fiber": 11.2,
     "prep": "8 min",
     "cook": "0 min",
     "ingredients": [
@@ -381,7 +391,8 @@ const RECIPES = [
     "tags": [
       "meal prep",
       "oats"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "savory-oats-egg-spinach",
@@ -389,11 +400,11 @@ const RECIPES = [
     "name": "Savory Oats with Egg and Spinach",
     "description": "Savory oats cooked with spinach, egg whites, tomato, Parmesan, and a soft egg.",
     "servings": 1,
-    "calories": 460,
-    "protein": 40,
-    "carbs": 48,
-    "fat": 14,
-    "fiber": 8,
+    "calories": 469,
+    "protein": 35.4,
+    "carbs": 42.0,
+    "fat": 17.7,
+    "fiber": 7.3,
     "prep": "7 min",
     "cook": "12 min",
     "ingredients": [
@@ -417,7 +428,8 @@ const RECIPES = [
     "tags": [
       "savory",
       "oats"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "greek-breakfast-plate",
@@ -425,11 +437,11 @@ const RECIPES = [
     "name": "Greek Breakfast Plate",
     "description": "Eggs, Greek yogurt, cucumber, tomato, olives, feta, and whole-grain toast.",
     "servings": 1,
-    "calories": 505,
-    "protein": 42,
-    "carbs": 39,
-    "fat": 21,
-    "fiber": 7,
+    "calories": 486,
+    "protein": 38.2,
+    "carbs": 32.1,
+    "fat": 23.6,
+    "fiber": 4.7,
     "prep": "10 min",
     "cook": "8 min",
     "ingredients": [
@@ -453,7 +465,8 @@ const RECIPES = [
     "tags": [
       "plate",
       "eggs"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "pineapple-almond-yogurt-bowl",
@@ -461,11 +474,11 @@ const RECIPES = [
     "name": "Pineapple Almond Yogurt Bowl",
     "description": "Greek yogurt with pineapple, banana, almonds, oats, and protein powder.",
     "servings": 1,
-    "calories": 465,
-    "protein": 43,
-    "carbs": 60,
-    "fat": 8,
-    "fiber": 7,
+    "calories": 500,
+    "protein": 48.4,
+    "carbs": 60.2,
+    "fat": 9.3,
+    "fiber": 7.2,
     "prep": "6 min",
     "cook": "0 min",
     "ingredients": [
@@ -486,7 +499,8 @@ const RECIPES = [
     "tags": [
       "no cook",
       "fruit"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "sweet-potato-egg-hash",
@@ -494,11 +508,11 @@ const RECIPES = [
     "name": "Sweet Potato Egg Hash",
     "description": "Roasted sweet potato, peppers, spinach, turkey, eggs, and feta.",
     "servings": 1,
-    "calories": 510,
-    "protein": 42,
-    "carbs": 48,
-    "fat": 18,
-    "fiber": 9,
+    "calories": 557,
+    "protein": 48.7,
+    "carbs": 44.5,
+    "fat": 19.9,
+    "fiber": 8.0,
     "prep": "10 min",
     "cook": "20 min",
     "ingredients": [
@@ -514,7 +528,7 @@ const RECIPES = [
     ],
     "steps": [
       "Microwave diced sweet potato for 4 minutes to soften.",
-      "Heat olive oil in a skillet and cook sweet potato and pepper for 7–8 minutes until browned.",
+      "Heat olive oil in a skillet and cook sweet potato and pepper for 7\u20138 minutes until browned.",
       "Add turkey and spinach and cook 2 minutes.",
       "Make wells in the hash, add eggs and egg whites, cover, and cook until set.",
       "Finish with feta, paprika, garlic powder, and pepper."
@@ -522,7 +536,8 @@ const RECIPES = [
     "tags": [
       "sweet potato",
       "skillet"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "lemon-garlic-chicken-bowl",
@@ -530,11 +545,11 @@ const RECIPES = [
     "name": "Lemon Garlic Chicken Bowl",
     "description": "Lemon-oregano chicken with rice, broccoli, tomato, cucumber, and yogurt sauce.",
     "servings": 1,
-    "calories": 610,
-    "protein": 55,
-    "carbs": 68,
-    "fat": 16,
-    "fiber": 9,
+    "calories": 631,
+    "protein": 55.9,
+    "carbs": 67.7,
+    "fat": 15.2,
+    "fiber": 6.0,
     "prep": "12 min",
     "cook": "20 min",
     "ingredients": [
@@ -551,7 +566,7 @@ const RECIPES = [
     ],
     "steps": [
       "Mix chicken with 1 teaspoon olive oil, lemon juice, garlic, oregano, salt, and pepper.",
-      "Cook chicken in a skillet over medium-high heat for 5–7 minutes per side, until it reaches 165°F.",
+      "Cook chicken in a skillet over medium-high heat for 5\u20137 minutes per side, until it reaches 165\u00b0F.",
       "Steam or roast broccoli until tender-crisp.",
       "Stir yogurt with a squeeze of lemon and pepper.",
       "Layer rice, broccoli, cucumber, tomato, and sliced chicken in a bowl; finish with yogurt sauce and remaining olive oil."
@@ -559,7 +574,8 @@ const RECIPES = [
     "tags": [
       "chicken",
       "bowl"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "chicken-shawarma-pita",
@@ -567,11 +583,11 @@ const RECIPES = [
     "name": "Chicken Shawarma Pita",
     "description": "Spiced chicken, tomato, cucumber, greens, and tzatziki in whole-wheat pita.",
     "servings": 1,
-    "calories": 590,
-    "protein": 52,
-    "carbs": 58,
-    "fat": 17,
-    "fiber": 8,
+    "calories": 544,
+    "protein": 50.2,
+    "carbs": 45.3,
+    "fat": 18.8,
+    "fiber": 7.3,
     "prep": "15 min",
     "cook": "16 min",
     "ingredients": [
@@ -589,7 +605,7 @@ const RECIPES = [
     ],
     "steps": [
       "Toss chicken with olive oil, cumin, paprika, turmeric, garlic powder, salt, and pepper.",
-      "Cook in a hot skillet for 8–10 minutes, turning until browned and 165°F inside.",
+      "Cook in a hot skillet for 8\u201310 minutes, turning until browned and 165\u00b0F inside.",
       "Warm the pita and slice the vegetables.",
       "Open the pita and add romaine, tomato, cucumber, and chicken.",
       "Spoon in tzatziki and serve."
@@ -597,7 +613,8 @@ const RECIPES = [
     "tags": [
       "pita",
       "chicken"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "turkey-kofta-rice-bowl",
@@ -605,11 +622,11 @@ const RECIPES = [
     "name": "Turkey Kofta Rice Bowl",
     "description": "Turkey kofta patties with rice, cucumber-tomato salad, feta, and yogurt sauce.",
     "servings": 1,
-    "calories": 620,
-    "protein": 54,
-    "carbs": 69,
-    "fat": 18,
-    "fiber": 8,
+    "calories": 720,
+    "protein": 54.3,
+    "carbs": 52.5,
+    "fat": 29.3,
+    "fiber": 2.2,
     "prep": "15 min",
     "cook": "18 min",
     "ingredients": [
@@ -628,14 +645,15 @@ const RECIPES = [
     "steps": [
       "Mix turkey with parsley, cumin, coriander, garlic powder, salt, and pepper.",
       "Shape into 4 small oval patties.",
-      "Cook in a lightly oiled skillet for 4–5 minutes per side, until 165°F inside.",
+      "Cook in a lightly oiled skillet for 4\u20135 minutes per side, until 165\u00b0F inside.",
       "Chop cucumber and tomato and toss with 1 teaspoon olive oil.",
       "Serve kofta over rice with salad, feta, and yogurt."
     ],
     "tags": [
       "turkey",
       "bowl"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "greek-chicken-salad-pita",
@@ -643,11 +661,11 @@ const RECIPES = [
     "name": "Greek Chicken Salad Pita",
     "description": "Grilled chicken, crunchy Greek salad, feta, and yogurt dressing in a pita.",
     "servings": 1,
-    "calories": 575,
-    "protein": 53,
-    "carbs": 54,
-    "fat": 17,
-    "fiber": 9,
+    "calories": 571,
+    "protein": 52.1,
+    "carbs": 52.2,
+    "fat": 17.9,
+    "fiber": 8.8,
     "prep": "12 min",
     "cook": "15 min",
     "ingredients": [
@@ -665,7 +683,7 @@ const RECIPES = [
     ],
     "steps": [
       "Season chicken with oregano, salt, and pepper.",
-      "Cook in a skillet with olive oil for 5–7 minutes per side, until 165°F; rest and slice.",
+      "Cook in a skillet with olive oil for 5\u20137 minutes per side, until 165\u00b0F; rest and slice.",
       "Chop romaine, cucumber, tomato, pepper, and onion.",
       "Toss vegetables with yogurt dressing and feta.",
       "Stuff the pita with salad and sliced chicken."
@@ -673,7 +691,8 @@ const RECIPES = [
     "tags": [
       "pita",
       "salad"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "salmon-tzatziki-bowl",
@@ -681,11 +700,11 @@ const RECIPES = [
     "name": "Salmon Tzatziki Bowl",
     "description": "Roasted salmon with quinoa, cucumber, tomato, spinach, and tzatziki.",
     "servings": 1,
-    "calories": 640,
-    "protein": 48,
-    "carbs": 58,
-    "fat": 24,
-    "fiber": 9,
+    "calories": 674,
+    "protein": 46.3,
+    "carbs": 45.1,
+    "fat": 34.5,
+    "fiber": 7.5,
     "prep": "12 min",
     "cook": "18 min",
     "ingredients": [
@@ -700,16 +719,17 @@ const RECIPES = [
       "Dill, garlic powder, salt, and pepper"
     ],
     "steps": [
-      "Heat oven to 425°F.",
+      "Heat oven to 425\u00b0F.",
       "Season salmon with lemon, dill, garlic powder, salt, and pepper.",
-      "Bake for 10–13 minutes, until it flakes and reaches about 145°F.",
+      "Bake for 10\u201313 minutes, until it flakes and reaches about 145\u00b0F.",
       "Warm quinoa and lightly wilt spinach in a skillet or microwave.",
       "Assemble quinoa, spinach, cucumber, tomato, salmon, tzatziki, and olive oil."
     ],
     "tags": [
       "salmon",
       "quinoa"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "shrimp-quinoa-bowl",
@@ -717,11 +737,11 @@ const RECIPES = [
     "name": "Shrimp Quinoa Bowl",
     "description": "Garlic shrimp with quinoa, peppers, spinach, cucumber, and lemon feta dressing.",
     "servings": 1,
-    "calories": 585,
-    "protein": 49,
-    "carbs": 63,
-    "fat": 16,
-    "fiber": 10,
+    "calories": 578,
+    "protein": 54.5,
+    "carbs": 49.6,
+    "fat": 19.2,
+    "fiber": 8.3,
     "prep": "12 min",
     "cook": "14 min",
     "ingredients": [
@@ -746,7 +766,8 @@ const RECIPES = [
     "tags": [
       "shrimp",
       "quinoa"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "mediterranean-turkey-meatballs",
@@ -754,11 +775,11 @@ const RECIPES = [
     "name": "Mediterranean Turkey Meatballs",
     "description": "Herbed turkey meatballs with rice, green beans, tomato sauce, and feta.",
     "servings": 1,
-    "calories": 625,
-    "protein": 55,
-    "carbs": 70,
-    "fat": 17,
-    "fiber": 9,
+    "calories": 776,
+    "protein": 54.3,
+    "carbs": 76.9,
+    "fat": 25.3,
+    "fiber": 7.7,
     "prep": "15 min",
     "cook": "25 min",
     "ingredients": [
@@ -773,16 +794,17 @@ const RECIPES = [
       "Parsley, oregano, salt, and pepper"
     ],
     "steps": [
-      "Heat oven to 425°F and line a pan.",
+      "Heat oven to 425\u00b0F and line a pan.",
       "Mix turkey, breadcrumbs, garlic, parsley, oregano, salt, and pepper.",
-      "Shape into 6 meatballs and bake for 15–18 minutes, until 165°F.",
+      "Shape into 6 meatballs and bake for 15\u201318 minutes, until 165\u00b0F.",
       "Warm crushed tomatoes in a small pan and steam green beans.",
       "Serve meatballs with rice, sauce, green beans, feta, and olive oil."
     ],
     "tags": [
       "turkey",
       "meal prep"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "chicken-souvlaki-pita",
@@ -790,11 +812,11 @@ const RECIPES = [
     "name": "Chicken Souvlaki Pita",
     "description": "Lemon-herb chicken, tomato, cucumber, onion, and tzatziki in pita.",
     "servings": 1,
-    "calories": 600,
-    "protein": 54,
-    "carbs": 57,
-    "fat": 18,
-    "fiber": 8,
+    "calories": 549,
+    "protein": 49.9,
+    "carbs": 46.9,
+    "fat": 18.7,
+    "fiber": 6.8,
     "prep": "15 min",
     "cook": "15 min",
     "ingredients": [
@@ -811,14 +833,15 @@ const RECIPES = [
     "steps": [
       "Toss chicken with olive oil, lemon, oregano, garlic powder, salt, and pepper.",
       "Thread onto skewers or cook directly in a skillet.",
-      "Cook over medium-high heat for 8–10 minutes, turning until browned and 165°F.",
+      "Cook over medium-high heat for 8\u201310 minutes, turning until browned and 165\u00b0F.",
       "Warm pita and chop vegetables.",
       "Fill pita with chicken, vegetables, and tzatziki."
     ],
     "tags": [
       "pita",
       "chicken"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "cod-chickpea-salad-bowl",
@@ -826,11 +849,11 @@ const RECIPES = [
     "name": "Cod Chickpea Salad Bowl",
     "description": "Lemon cod over chickpeas, greens, cucumber, tomato, and feta.",
     "servings": 1,
-    "calories": 570,
-    "protein": 48,
-    "carbs": 55,
-    "fat": 18,
-    "fiber": 12,
+    "calories": 521,
+    "protein": 47.6,
+    "carbs": 40.5,
+    "fat": 19.6,
+    "fiber": 11.3,
     "prep": "12 min",
     "cook": "14 min",
     "ingredients": [
@@ -846,7 +869,7 @@ const RECIPES = [
     ],
     "steps": [
       "Season cod with paprika, oregano, salt, and pepper.",
-      "Heat 1 teaspoon olive oil in a skillet and cook cod 4–5 minutes per side, until opaque and about 145°F.",
+      "Heat 1 teaspoon olive oil in a skillet and cook cod 4\u20135 minutes per side, until opaque and about 145\u00b0F.",
       "Rinse and drain chickpeas.",
       "Toss greens, cucumber, tomato, chickpeas, feta, remaining olive oil, and lemon.",
       "Place cod over the salad."
@@ -854,7 +877,8 @@ const RECIPES = [
     "tags": [
       "cod",
       "chickpeas"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "roasted-pepper-chicken-pasta",
@@ -862,11 +886,11 @@ const RECIPES = [
     "name": "Roasted Red Pepper Chicken Pasta",
     "description": "Whole-wheat pasta with chicken, roasted pepper sauce, spinach, and Parmesan.",
     "servings": 1,
-    "calories": 650,
-    "protein": 58,
-    "carbs": 72,
-    "fat": 17,
-    "fiber": 10,
+    "calories": 696,
+    "protein": 60.8,
+    "carbs": 69.5,
+    "fat": 20.8,
+    "fiber": 11.6,
     "prep": "12 min",
     "cook": "22 min",
     "ingredients": [
@@ -882,7 +906,7 @@ const RECIPES = [
     ],
     "steps": [
       "Boil pasta until al dente; reserve 60 ml pasta water.",
-      "Season and cook chicken in 1 teaspoon olive oil until 165°F, then slice.",
+      "Season and cook chicken in 1 teaspoon olive oil until 165\u00b0F, then slice.",
       "Blend roasted peppers, crushed tomatoes, garlic, basil, salt, and pepper.",
       "Simmer sauce in the skillet, add spinach, then stir in pasta and enough pasta water to loosen.",
       "Top with chicken, Parmesan, and remaining olive oil."
@@ -890,7 +914,8 @@ const RECIPES = [
     "tags": [
       "pasta",
       "chicken"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "herb-turkey-stuffed-peppers",
@@ -898,11 +923,11 @@ const RECIPES = [
     "name": "Herb Turkey Stuffed Peppers",
     "description": "Bell pepper halves filled with turkey, rice, tomato, spinach, and feta.",
     "servings": 1,
-    "calories": 590,
-    "protein": 52,
-    "carbs": 61,
-    "fat": 17,
-    "fiber": 10,
+    "calories": 720,
+    "protein": 51.3,
+    "carbs": 65.3,
+    "fat": 25.3,
+    "fiber": 8.6,
     "prep": "15 min",
     "cook": "30 min",
     "ingredients": [
@@ -917,16 +942,17 @@ const RECIPES = [
       "Oregano, salt, and pepper"
     ],
     "steps": [
-      "Heat oven to 400°F.",
+      "Heat oven to 400\u00b0F.",
       "Place pepper halves in a baking dish with a splash of water and bake 10 minutes.",
-      "Cook turkey in olive oil with garlic, oregano, salt, and pepper until browned and 165°F.",
+      "Cook turkey in olive oil with garlic, oregano, salt, and pepper until browned and 165\u00b0F.",
       "Stir in rice, tomatoes, and spinach.",
-      "Fill peppers, top with feta, and bake 12–15 minutes more."
+      "Fill peppers, top with feta, and bake 12\u201315 minutes more."
     ],
     "tags": [
       "turkey",
       "peppers"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "steak-greek-salad",
@@ -934,11 +960,11 @@ const RECIPES = [
     "name": "Steak Greek Salad",
     "description": "Lean sirloin over romaine, tomatoes, cucumber, peppers, potatoes, olives, and feta.",
     "servings": 1,
-    "calories": 615,
-    "protein": 50,
-    "carbs": 49,
-    "fat": 25,
-    "fiber": 10,
+    "calories": 695,
+    "protein": 47.7,
+    "carbs": 46.3,
+    "fat": 35.3,
+    "fiber": 8.5,
     "prep": "15 min",
     "cook": "20 min",
     "ingredients": [
@@ -955,7 +981,7 @@ const RECIPES = [
       "Oregano, salt, and pepper"
     ],
     "steps": [
-      "Halve potatoes and roast at 425°F with 1 teaspoon olive oil for about 20 minutes.",
+      "Halve potatoes and roast at 425\u00b0F with 1 teaspoon olive oil for about 20 minutes.",
       "Season steak with salt, pepper, and oregano.",
       "Sear in a hot skillet to preferred doneness, then rest 5 minutes and slice.",
       "Toss romaine, tomato, cucumber, pepper, feta, olives, vinegar, and remaining olive oil.",
@@ -964,7 +990,8 @@ const RECIPES = [
     "tags": [
       "beef",
       "salad"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "garlic-shrimp-pita",
@@ -972,11 +999,11 @@ const RECIPES = [
     "name": "Garlic Shrimp Pita",
     "description": "Garlic shrimp, crunchy salad, feta, and yogurt sauce in a whole-wheat pita.",
     "servings": 1,
-    "calories": 570,
-    "protein": 48,
-    "carbs": 55,
-    "fat": 18,
-    "fiber": 8,
+    "calories": 537,
+    "protein": 55.7,
+    "carbs": 47.8,
+    "fat": 16.0,
+    "fiber": 7.5,
     "prep": "12 min",
     "cook": "10 min",
     "ingredients": [
@@ -1001,7 +1028,8 @@ const RECIPES = [
     "tags": [
       "shrimp",
       "pita"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "lemon-herb-salmon-salad",
@@ -1009,11 +1037,11 @@ const RECIPES = [
     "name": "Lemon Herb Salmon Salad",
     "description": "Salmon with greens, quinoa, cucumber, orange, almonds, and lemon dressing.",
     "servings": 1,
-    "calories": 625,
-    "protein": 47,
-    "carbs": 52,
-    "fat": 26,
-    "fiber": 10,
+    "calories": 725,
+    "protein": 45.6,
+    "carbs": 46.6,
+    "fat": 40.5,
+    "fiber": 9.3,
     "prep": "12 min",
     "cook": "15 min",
     "ingredients": [
@@ -1029,7 +1057,7 @@ const RECIPES = [
     ],
     "steps": [
       "Season salmon with dill, salt, pepper, and half the lemon juice.",
-      "Bake at 425°F for 10–13 minutes or pan-sear until about 145°F.",
+      "Bake at 425\u00b0F for 10\u201313 minutes or pan-sear until about 145\u00b0F.",
       "Add greens, quinoa, cucumber, orange, and almonds to a bowl.",
       "Whisk olive oil with remaining lemon juice.",
       "Flake salmon over the salad and drizzle with dressing."
@@ -1037,7 +1065,8 @@ const RECIPES = [
     "tags": [
       "salmon",
       "salad"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "mediterranean-chicken-quinoa-bowl",
@@ -1045,11 +1074,11 @@ const RECIPES = [
     "name": "Mediterranean Chicken Quinoa Bowl",
     "description": "Chicken, quinoa, roasted vegetables, cucumber, feta, and herb yogurt.",
     "servings": 1,
-    "calories": 620,
-    "protein": 57,
-    "carbs": 62,
-    "fat": 17,
-    "fiber": 11,
+    "calories": 641,
+    "protein": 60.1,
+    "carbs": 47.8,
+    "fat": 22.9,
+    "fiber": 7.6,
     "prep": "15 min",
     "cook": "22 min",
     "ingredients": [
@@ -1064,16 +1093,17 @@ const RECIPES = [
       "Lemon juice, oregano, garlic powder, salt, and pepper"
     ],
     "steps": [
-      "Heat oven to 425°F.",
+      "Heat oven to 425\u00b0F.",
       "Toss bell pepper and mushrooms with 1 teaspoon olive oil and roast 15 minutes.",
-      "Season chicken with oregano, garlic powder, salt, and pepper; cook until 165°F and slice.",
+      "Season chicken with oregano, garlic powder, salt, and pepper; cook until 165\u00b0F and slice.",
       "Mix yogurt with lemon juice and black pepper.",
       "Layer quinoa, roasted vegetables, cucumber, chicken, feta, and yogurt sauce."
     ],
     "tags": [
       "chicken",
       "quinoa"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "herb-salmon-roasted-potatoes",
@@ -1081,11 +1111,11 @@ const RECIPES = [
     "name": "Herb Salmon with Roasted Potatoes",
     "description": "Dill-lemon salmon with roasted potatoes and asparagus.",
     "servings": 1,
-    "calories": 710,
-    "protein": 57,
-    "carbs": 65,
-    "fat": 25,
-    "fiber": 10,
+    "calories": 711,
+    "protein": 48.1,
+    "carbs": 52.7,
+    "fat": 35.0,
+    "fiber": 9.1,
     "prep": "12 min",
     "cook": "28 min",
     "ingredients": [
@@ -1098,16 +1128,17 @@ const RECIPES = [
       "Dill, parsley, salt, and pepper"
     ],
     "steps": [
-      "Heat oven to 425°F.",
+      "Heat oven to 425\u00b0F.",
       "Toss potatoes with 1 teaspoon olive oil, salt, and pepper; roast 15 minutes.",
       "Add asparagus to the pan with half the remaining oil.",
       "Season salmon with lemon, garlic, herbs, salt, pepper, and remaining oil; place on the pan.",
-      "Roast 10–13 minutes more, until salmon is about 145°F and potatoes are tender."
+      "Roast 10\u201313 minutes more, until salmon is about 145\u00b0F and potatoes are tender."
     ],
     "tags": [
       "salmon",
       "sheet pan"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "garlic-cod-rice-green-beans",
@@ -1115,11 +1146,11 @@ const RECIPES = [
     "name": "Garlic Cod with Rice and Green Beans",
     "description": "Pan-seared cod with garlic, jasmine rice, green beans, and lemon.",
     "servings": 1,
-    "calories": 650,
-    "protein": 55,
-    "carbs": 73,
-    "fat": 15,
-    "fiber": 9,
+    "calories": 559,
+    "protein": 44.5,
+    "carbs": 69.1,
+    "fat": 11.3,
+    "fiber": 5.8,
     "prep": "10 min",
     "cook": "20 min",
     "ingredients": [
@@ -1135,13 +1166,14 @@ const RECIPES = [
       "Steam green beans until tender-crisp and warm the rice.",
       "Pat cod dry and season with paprika, salt, and pepper.",
       "Heat olive oil in a skillet over medium-high heat.",
-      "Cook cod 4–5 minutes per side; add garlic during the final minute and cook until fish is opaque and about 145°F.",
+      "Cook cod 4\u20135 minutes per side; add garlic during the final minute and cook until fish is opaque and about 145\u00b0F.",
       "Serve with rice and green beans; spoon garlic oil and lemon over everything."
     ],
     "tags": [
       "cod",
       "rice"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "mediterranean-chicken-pasta",
@@ -1149,11 +1181,11 @@ const RECIPES = [
     "name": "Mediterranean Chicken Pasta",
     "description": "Whole-wheat pasta with chicken, tomatoes, spinach, olives, feta, and herbs.",
     "servings": 1,
-    "calories": 700,
-    "protein": 61,
-    "carbs": 75,
-    "fat": 19,
-    "fiber": 11,
+    "calories": 739,
+    "protein": 61.9,
+    "carbs": 73.9,
+    "fat": 23.9,
+    "fiber": 11.8,
     "prep": "12 min",
     "cook": "24 min",
     "ingredients": [
@@ -1169,7 +1201,7 @@ const RECIPES = [
     ],
     "steps": [
       "Boil pasta until al dente, reserving a little pasta water.",
-      "Season chicken and cook in 1 teaspoon olive oil until 165°F; rest and slice.",
+      "Season chicken and cook in 1 teaspoon olive oil until 165\u00b0F; rest and slice.",
       "Cook garlic briefly, then add tomatoes, basil, oregano, salt, and pepper; simmer 5 minutes.",
       "Stir in spinach, olives, pasta, and enough pasta water to coat.",
       "Top with sliced chicken, feta, and remaining olive oil."
@@ -1177,7 +1209,8 @@ const RECIPES = [
     "tags": [
       "pasta",
       "chicken"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "sheet-pan-chicken-peppers-potatoes",
@@ -1185,11 +1218,11 @@ const RECIPES = [
     "name": "Sheet-Pan Chicken, Peppers & Potatoes",
     "description": "Roasted chicken breast with peppers, onion, potatoes, lemon, and oregano.",
     "servings": 1,
-    "calories": 665,
-    "protein": 58,
-    "carbs": 67,
-    "fat": 18,
-    "fiber": 10,
+    "calories": 585,
+    "protein": 52.3,
+    "carbs": 59.5,
+    "fat": 14.9,
+    "fiber": 9.1,
     "prep": "15 min",
     "cook": "30 min",
     "ingredients": [
@@ -1203,16 +1236,17 @@ const RECIPES = [
       "Oregano, paprika, salt, and pepper"
     ],
     "steps": [
-      "Heat oven to 425°F.",
+      "Heat oven to 425\u00b0F.",
       "Microwave potatoes for 4 minutes to start cooking them.",
       "Toss potatoes, peppers, onion, and chicken with olive oil, lemon, garlic, oregano, paprika, salt, and pepper.",
       "Spread on a sheet pan in one layer.",
-      "Roast 22–26 minutes, stirring once, until chicken reaches 165°F and potatoes are browned."
+      "Roast 22\u201326 minutes, stirring once, until chicken reaches 165\u00b0F and potatoes are browned."
     ],
     "tags": [
       "sheet pan",
       "chicken"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "turkey-stuffed-eggplant",
@@ -1220,11 +1254,11 @@ const RECIPES = [
     "name": "Turkey Stuffed Eggplant",
     "description": "Roasted eggplant filled with turkey, tomatoes, spinach, rice, and feta.",
     "servings": 1,
-    "calories": 620,
-    "protein": 52,
-    "carbs": 55,
-    "fat": 22,
-    "fiber": 12,
+    "calories": 761,
+    "protein": 53.8,
+    "carbs": 64.8,
+    "fat": 30.4,
+    "fiber": 13.1,
     "prep": "15 min",
     "cook": "35 min",
     "ingredients": [
@@ -1239,16 +1273,17 @@ const RECIPES = [
       "Oregano, salt, and pepper"
     ],
     "steps": [
-      "Heat oven to 425°F. Halve eggplant and score the flesh.",
+      "Heat oven to 425\u00b0F. Halve eggplant and score the flesh.",
       "Brush with 1 teaspoon olive oil and roast cut-side down for 20 minutes.",
-      "Cook turkey with remaining oil, garlic, oregano, salt, and pepper until 165°F.",
+      "Cook turkey with remaining oil, garlic, oregano, salt, and pepper until 165\u00b0F.",
       "Stir in tomatoes, spinach, and rice. Scoop some eggplant flesh into the filling.",
-      "Fill eggplant shells, top with feta, and bake 8–10 minutes."
+      "Fill eggplant shells, top with feta, and bake 8\u201310 minutes."
     ],
     "tags": [
       "turkey",
       "eggplant"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "lemon-shrimp-orzo",
@@ -1256,11 +1291,11 @@ const RECIPES = [
     "name": "Lemon Shrimp Orzo",
     "description": "Shrimp and whole-wheat orzo with spinach, tomatoes, feta, and lemon.",
     "servings": 1,
-    "calories": 660,
-    "protein": 51,
-    "carbs": 78,
-    "fat": 17,
-    "fiber": 10,
+    "calories": 645,
+    "protein": 59.7,
+    "carbs": 67.5,
+    "fat": 18.2,
+    "fiber": 10.0,
     "prep": "12 min",
     "cook": "20 min",
     "ingredients": [
@@ -1284,7 +1319,8 @@ const RECIPES = [
     "tags": [
       "shrimp",
       "orzo"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "chicken-piccata-asparagus",
@@ -1292,11 +1328,11 @@ const RECIPES = [
     "name": "Chicken Piccata with Asparagus",
     "description": "Lemon-caper chicken with asparagus and roasted potatoes.",
     "servings": 1,
-    "calories": 670,
-    "protein": 60,
-    "carbs": 61,
-    "fat": 20,
-    "fiber": 9,
+    "calories": 599,
+    "protein": 56.7,
+    "carbs": 60.9,
+    "fat": 15.2,
+    "fiber": 10.6,
     "prep": "15 min",
     "cook": "28 min",
     "ingredients": [
@@ -1312,16 +1348,17 @@ const RECIPES = [
       "Salt, pepper, and parsley"
     ],
     "steps": [
-      "Heat oven to 425°F and roast halved potatoes with 1 teaspoon olive oil for 25 minutes.",
+      "Heat oven to 425\u00b0F and roast halved potatoes with 1 teaspoon olive oil for 25 minutes.",
       "Season chicken and lightly dust with flour.",
-      "Sear chicken in remaining oil for 3–4 minutes per side, until 165°F; remove.",
+      "Sear chicken in remaining oil for 3\u20134 minutes per side, until 165\u00b0F; remove.",
       "Add garlic, broth, lemon, and capers to the skillet and simmer until slightly reduced.",
       "Steam asparagus and return chicken to the sauce. Serve with potatoes and parsley."
     ],
     "tags": [
       "chicken",
       "lemon"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "greek-turkey-burger-potatoes",
@@ -1329,11 +1366,11 @@ const RECIPES = [
     "name": "Greek Turkey Burger with Potatoes",
     "description": "Feta-herb turkey burger with roasted potatoes, tomato-cucumber salad, and yogurt sauce.",
     "servings": 1,
-    "calories": 690,
-    "protein": 58,
-    "carbs": 65,
-    "fat": 22,
-    "fiber": 10,
+    "calories": 809,
+    "protein": 59.8,
+    "carbs": 65.0,
+    "fat": 31.3,
+    "fiber": 10.0,
     "prep": "15 min",
     "cook": "28 min",
     "ingredients": [
@@ -1348,16 +1385,17 @@ const RECIPES = [
       "Oregano, garlic powder, salt, and pepper"
     ],
     "steps": [
-      "Heat oven to 425°F and roast potatoes with 1 teaspoon olive oil for 25 minutes.",
+      "Heat oven to 425\u00b0F and roast potatoes with 1 teaspoon olive oil for 25 minutes.",
       "Mix turkey with feta, oregano, garlic powder, salt, and pepper; shape into a patty.",
-      "Cook in a skillet 5–6 minutes per side, until 165°F.",
+      "Cook in a skillet 5\u20136 minutes per side, until 165\u00b0F.",
       "Mix yogurt with pepper and a squeeze of lemon if available.",
       "Serve burger on the sandwich thin with tomato-cucumber salad, yogurt sauce, and potatoes."
     ],
     "tags": [
       "turkey",
       "burger"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "baked-cod-tomato-olive",
@@ -1365,11 +1403,11 @@ const RECIPES = [
     "name": "Baked Cod with Tomato & Olive",
     "description": "Cod baked in tomato, olive, garlic, and herb sauce with quinoa.",
     "servings": 1,
-    "calories": 630,
-    "protein": 55,
-    "carbs": 63,
-    "fat": 17,
-    "fiber": 10,
+    "calories": 564,
+    "protein": 49.0,
+    "carbs": 56.1,
+    "fat": 16.6,
+    "fiber": 9.9,
     "prep": "12 min",
     "cook": "24 min",
     "ingredients": [
@@ -1383,16 +1421,17 @@ const RECIPES = [
       "Oregano, parsley, salt, and pepper"
     ],
     "steps": [
-      "Heat oven to 400°F.",
+      "Heat oven to 400\u00b0F.",
       "Cook bell pepper and garlic in 1 teaspoon olive oil for 3 minutes.",
       "Add crushed tomatoes, olives, oregano, salt, and pepper; simmer 5 minutes.",
-      "Place cod in a baking dish, pour sauce over it, drizzle with remaining oil, and bake 12–15 minutes until about 145°F.",
+      "Place cod in a baking dish, pour sauce over it, drizzle with remaining oil, and bake 12\u201315 minutes until about 145\u00b0F.",
       "Serve over quinoa with parsley."
     ],
     "tags": [
       "cod",
       "tomato"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "salmon-spinach-rice-skillet",
@@ -1400,11 +1439,11 @@ const RECIPES = [
     "name": "Salmon Spinach Rice Skillet",
     "description": "Flaked salmon with rice, spinach, tomatoes, lemon, and feta.",
     "servings": 1,
-    "calories": 695,
-    "protein": 53,
-    "carbs": 69,
-    "fat": 24,
-    "fiber": 9,
+    "calories": 822,
+    "protein": 49.9,
+    "carbs": 63.4,
+    "fat": 40.2,
+    "fiber": 3.8,
     "prep": "12 min",
     "cook": "20 min",
     "ingredients": [
@@ -1420,7 +1459,7 @@ const RECIPES = [
     ],
     "steps": [
       "Season salmon with dill, salt, and pepper.",
-      "Cook salmon in 1 teaspoon olive oil for 4–5 minutes per side, until about 145°F; remove and flake.",
+      "Cook salmon in 1 teaspoon olive oil for 4\u20135 minutes per side, until about 145\u00b0F; remove and flake.",
       "Cook garlic and tomatoes in remaining oil for 3 minutes.",
       "Add spinach and rice and stir until hot.",
       "Fold in salmon, lemon juice, and feta."
@@ -1428,7 +1467,8 @@ const RECIPES = [
     "tags": [
       "salmon",
       "skillet"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "chicken-kabobs-quinoa",
@@ -1436,11 +1476,11 @@ const RECIPES = [
     "name": "Chicken Kabobs with Quinoa",
     "description": "Lemon-herb chicken skewers with peppers, onions, quinoa, and tzatziki.",
     "servings": 1,
-    "calories": 675,
-    "protein": 61,
-    "carbs": 65,
-    "fat": 18,
-    "fiber": 10,
+    "calories": 636,
+    "protein": 56.1,
+    "carbs": 51.8,
+    "fat": 21.9,
+    "fiber": 8.4,
     "prep": "18 min",
     "cook": "18 min",
     "ingredients": [
@@ -1456,14 +1496,15 @@ const RECIPES = [
     "steps": [
       "Toss chicken with olive oil, lemon, oregano, garlic powder, salt, and pepper.",
       "Thread chicken, peppers, and onion onto skewers.",
-      "Grill or broil for 12–15 minutes, turning, until chicken reaches 165°F.",
+      "Grill or broil for 12\u201315 minutes, turning, until chicken reaches 165\u00b0F.",
       "Warm quinoa.",
       "Serve kabobs over quinoa with tzatziki."
     ],
     "tags": [
       "chicken",
       "kabobs"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "beef-kofta-rice",
@@ -1471,11 +1512,11 @@ const RECIPES = [
     "name": "Beef Kofta with Rice",
     "description": "Lean beef kofta with rice, cucumber-tomato salad, feta, and yogurt.",
     "servings": 1,
-    "calories": 700,
-    "protein": 53,
-    "carbs": 68,
-    "fat": 24,
-    "fiber": 8,
+    "calories": 710,
+    "protein": 57.1,
+    "carbs": 55.0,
+    "fat": 24.3,
+    "fiber": 2.2,
     "prep": "15 min",
     "cook": "18 min",
     "ingredients": [
@@ -1494,14 +1535,15 @@ const RECIPES = [
     "steps": [
       "Mix beef with parsley, cumin, coriander, garlic powder, salt, and pepper.",
       "Shape into 4 small logs.",
-      "Cook in a skillet over medium-high heat for 4–5 minutes per side, until cooked through.",
+      "Cook in a skillet over medium-high heat for 4\u20135 minutes per side, until cooked through.",
       "Toss cucumber and tomato with olive oil.",
       "Serve kofta with rice, salad, feta, and yogurt."
     ],
     "tags": [
       "beef",
       "kofta"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "shrimp-tomato-feta-pasta",
@@ -1509,11 +1551,11 @@ const RECIPES = [
     "name": "Shrimp Tomato Feta Pasta",
     "description": "Whole-wheat pasta with shrimp, tomatoes, spinach, feta, garlic, and herbs.",
     "servings": 1,
-    "calories": 680,
-    "protein": 55,
-    "carbs": 79,
-    "fat": 17,
-    "fiber": 11,
+    "calories": 693,
+    "protein": 62.3,
+    "carbs": 75.4,
+    "fat": 19.5,
+    "fiber": 11.8,
     "prep": "12 min",
     "cook": "22 min",
     "ingredients": [
@@ -1536,7 +1578,8 @@ const RECIPES = [
     "tags": [
       "shrimp",
       "pasta"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "roasted-garlic-chicken-thighs",
@@ -1544,11 +1587,11 @@ const RECIPES = [
     "name": "Roasted Garlic Chicken Thighs",
     "description": "Skinless chicken thighs with quinoa, Brussels sprouts, carrots, and lemon.",
     "servings": 1,
-    "calories": 715,
-    "protein": 58,
-    "carbs": 65,
-    "fat": 25,
-    "fiber": 12,
+    "calories": 726,
+    "protein": 57.4,
+    "carbs": 64.1,
+    "fat": 27.8,
+    "fiber": 14.0,
     "prep": "15 min",
     "cook": "32 min",
     "ingredients": [
@@ -1562,16 +1605,17 @@ const RECIPES = [
       "Thyme, paprika, salt, and pepper"
     ],
     "steps": [
-      "Heat oven to 425°F.",
+      "Heat oven to 425\u00b0F.",
       "Toss Brussels sprouts and carrots with 1 teaspoon olive oil, salt, and pepper.",
       "Season chicken with garlic, lemon, thyme, paprika, salt, pepper, and remaining oil.",
-      "Arrange everything on a sheet pan and roast 25–30 minutes, until chicken reaches 165°F.",
+      "Arrange everything on a sheet pan and roast 25\u201330 minutes, until chicken reaches 165\u00b0F.",
       "Serve with warm quinoa and pan juices."
     ],
     "tags": [
       "chicken thighs",
       "sheet pan"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "mediterranean-turkey-meatloaf",
@@ -1579,11 +1623,11 @@ const RECIPES = [
     "name": "Mediterranean Turkey Meatloaf",
     "description": "Individual turkey meatloaf with oats, spinach, feta, tomato glaze, and potatoes.",
     "servings": 1,
-    "calories": 685,
-    "protein": 61,
-    "carbs": 67,
-    "fat": 20,
-    "fiber": 10,
+    "calories": 897,
+    "protein": 67.6,
+    "carbs": 75.8,
+    "fat": 33.8,
+    "fiber": 13.5,
     "prep": "18 min",
     "cook": "35 min",
     "ingredients": [
@@ -1599,16 +1643,17 @@ const RECIPES = [
       "Garlic powder, oregano, salt, and pepper"
     ],
     "steps": [
-      "Heat oven to 400°F.",
+      "Heat oven to 400\u00b0F.",
       "Mix turkey, oats, spinach, feta, egg whites, garlic powder, oregano, salt, and pepper.",
       "Shape into a small loaf on a lined pan and spread tomato sauce over the top.",
-      "Add halved potatoes tossed with 1 teaspoon olive oil and bake 30–35 minutes, until meatloaf reaches 165°F.",
+      "Add halved potatoes tossed with 1 teaspoon olive oil and bake 30\u201335 minutes, until meatloaf reaches 165\u00b0F.",
       "Steam green beans and serve with the meatloaf, potatoes, and remaining olive oil."
     ],
     "tags": [
       "turkey",
       "meal prep"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "greek-yogurt-apple-crunch",
@@ -1616,11 +1661,11 @@ const RECIPES = [
     "name": "Greek Yogurt Apple Crunch",
     "description": "Greek yogurt with apple, almonds, oats, cinnamon, and honey.",
     "servings": 1,
-    "calories": 300,
-    "protein": 27,
-    "carbs": 37,
-    "fat": 7,
-    "fiber": 6,
+    "calories": 303,
+    "protein": 25.0,
+    "carbs": 36.7,
+    "fat": 7.7,
+    "fiber": 5.1,
     "prep": "5 min",
     "cook": "0 min",
     "ingredients": [
@@ -1640,7 +1685,8 @@ const RECIPES = [
     "tags": [
       "no cook",
       "yogurt"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "protein-shake-orange",
@@ -1648,11 +1694,11 @@ const RECIPES = [
     "name": "Protein Shake & Orange",
     "description": "A simple protein shake paired with a fresh orange.",
     "servings": 1,
-    "calories": 250,
-    "protein": 31,
-    "carbs": 28,
-    "fat": 3,
-    "fiber": 4,
+    "calories": 219,
+    "protein": 26.2,
+    "carbs": 19.1,
+    "fat": 4.2,
+    "fiber": 3.6,
     "prep": "3 min",
     "cook": "0 min",
     "ingredients": [
@@ -1671,7 +1717,8 @@ const RECIPES = [
     "tags": [
       "quick",
       "shake"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "hard-boiled-eggs-grapes",
@@ -1679,11 +1726,11 @@ const RECIPES = [
     "name": "Hard-Boiled Eggs & Grapes",
     "description": "Two hard-boiled eggs with grapes and a small serving of pistachios.",
     "servings": 1,
-    "calories": 285,
-    "protein": 17,
-    "carbs": 27,
-    "fat": 13,
-    "fiber": 3,
+    "calories": 282,
+    "protein": 15.4,
+    "carbs": 25.2,
+    "fat": 14.2,
+    "fiber": 2.1,
     "prep": "3 min",
     "cook": "10 min",
     "ingredients": [
@@ -1701,7 +1748,8 @@ const RECIPES = [
     "tags": [
       "eggs",
       "portable"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "hummus-carrot-pita-plate",
@@ -1709,11 +1757,11 @@ const RECIPES = [
     "name": "Hummus Carrot Pita Plate",
     "description": "Hummus with carrots, cucumber, and toasted whole-wheat pita wedges.",
     "servings": 1,
-    "calories": 310,
-    "protein": 12,
-    "carbs": 46,
-    "fat": 10,
-    "fiber": 10,
+    "calories": 298,
+    "protein": 11.7,
+    "carbs": 50.2,
+    "fat": 7.9,
+    "fiber": 11.4,
     "prep": "7 min",
     "cook": "3 min",
     "ingredients": [
@@ -1732,7 +1780,8 @@ const RECIPES = [
     "tags": [
       "hummus",
       "pita"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   },
   {
     "id": "pistachio-banana-yogurt-cup",
@@ -1740,11 +1789,11 @@ const RECIPES = [
     "name": "Pistachio Banana Yogurt Cup",
     "description": "Greek yogurt with banana, pistachios, cinnamon, and a touch of honey.",
     "servings": 1,
-    "calories": 280,
-    "protein": 25,
-    "carbs": 35,
-    "fat": 7,
-    "fiber": 4,
+    "calories": 275,
+    "protein": 23.9,
+    "carbs": 33.7,
+    "fat": 6.5,
+    "fiber": 3.4,
     "prep": "5 min",
     "cook": "0 min",
     "ingredients": [
@@ -1763,6 +1812,7 @@ const RECIPES = [
     "tags": [
       "no cook",
       "yogurt"
-    ]
+    ],
+    "nutritionMethod": "Calculated from listed gram weights using USDA FoodData Central reference values; fixed reference-label values are used for protein powder, pita, tortilla, granola, tzatziki, dressing, and sandwich thins."
   }
 ];
