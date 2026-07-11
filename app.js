@@ -3,21 +3,13 @@ const PROGRAM = {
   totalDays: 90,
   startWeight: 178,
   goalWeight: 155,
-  weeklyTargets: [
-    { calories: 2100, protein: 175 },
-    { calories: 2100, protein: 170 },
-    { calories: 2000, protein: 180 },
-    { calories: 2000, protein: 180 },
-    { calories: 1900, protein: 175 },
-    { calories: 1900, protein: 175 },
-    { calories: 1800, protein: 160 },
-    { calories: 1800, protein: 165 },
-    { calories: 1700, protein: 150 },
-    { calories: 1700, protein: 150 },
-    { calories: 1650, protein: 150 },
-    { calories: 1650, protein: 145 },
-    { calories: 1600, protein: 140 }
-  ]
+  cutEndDate: "2026-09-10",
+  recompStartDate: "2026-09-11",
+  programEndDate: "2026-10-08",
+  maintenanceDefault: 2200,
+  cutProtein: 180,
+  recompProtein: 165,
+  cutCalorieSteps: [2000, 2000, 1900, 1900, 1800, 1800, 1700, 1700, 1650]
 };
 
 const groceries = {
@@ -68,7 +60,7 @@ const CATEGORY_ICONS = {
 };
 
 const MEAL_SWAP_STORAGE_KEY = "med-cut-meal-swaps-v1";
-const FLEX_MEAL_CAPS = [750, 750, 700, 700, 650, 650, 600, 600, 550, 550, 500, 500, 500];
+const FLEX_MEAL_CAPS = [700, 700, 650, 650, 600, 600, 550, 550, 550, 750, 750, 750, 750];
 const SWAP_WINDOW_DAYS = 14;
 const SHAKE_FLAVOR_STORAGE_KEY = "med-cut-fairlife-flavor-v1";
 const FAIRLIFE_NUTRITION = {
@@ -77,6 +69,8 @@ const FAIRLIFE_NUTRITION = {
 };
 const WORK_DAYS = new Set([0, 4, 5, 6]); // Sunday, Monday, Friday, Saturday
 const WORK_SHIFT = "3:00–9:00 AM";
+const MAINTENANCE_CALORIES_STORAGE_KEY = "med-cut-maintenance-calories-v1";
+const BASE_MEAL_PLAN = JSON.parse(JSON.stringify(MEAL_PLAN));
 let activeSwapContext = null;
 
 
@@ -664,7 +658,7 @@ function renderPlanWeek(weekNumber) {
     <div class="week-summary-main">
       <p class="eyebrow">Week ${activePlanWeek}</p>
       <h2>${formatDate(first.date, { month: "long", day: "numeric" })}–${formatDate(last.date, { month: "long", day: "numeric", year: "numeric" })}</h2>
-      <p class="muted">${days.length} planned days · ${first.targetCalories.toLocaleString()} calorie target · two Fairlife shakes included daily</p>
+      <p class="muted">${days.length} planned days · ${first.targetCalories.toLocaleString()}${first.targetCalories !== last.targetCalories ? `–${last.targetCalories.toLocaleString()}` : ""} calorie target · two Fairlife shakes included daily</p>
     </div>
     <div class="week-summary-stat"><span>Average plan</span><strong>${Math.round(averages.calories).toLocaleString()} cal</strong></div>
     <div class="week-summary-stat"><span>Average protein</span><strong>${averages.protein.toFixed(0)}g</strong></div>
@@ -699,7 +693,7 @@ function renderPlanWeek(weekNumber) {
           <div class="plan-day-title">
             <div class="plan-day-number">${day.day}</div>
             <div>
-              <h3>${formatDate(day.date, { weekday: "long", month: "long", day: "numeric" })}${isToday ? " · Today" : ""}</h3>
+              <h3>${formatDate(day.date, { weekday: "long", month: "long", day: "numeric" })}${isToday ? " · Today" : ""}<span class="day-phase-badge ${day.phase}">${day.phase === "cut" ? "Cut" : "Recomp"}</span></h3>
               <p>Day ${day.day} of 90${canSwapDate(day.date) ? " · swaps unlocked" : ""}</p>
             </div>
           </div>
@@ -779,10 +773,118 @@ function daysBetween(first, second) {
   return Math.floor((localDay(first) - localDay(second)) / 86400000);
 }
 
+
+function maintenanceCalories() {
+  const saved = Number(localStorage.getItem(MAINTENANCE_CALORIES_STORAGE_KEY));
+  return Number.isFinite(saved) && saved >= 1800 && saved <= 3000
+    ? saved
+    : PROGRAM.maintenanceDefault;
+}
+
+function programPhaseForDate(date) {
+  const cutEnd = parseLocalDate(PROGRAM.cutEndDate);
+  return localDay(date) <= cutEnd ? "cut" : "recomp";
+}
+
+function phaseTargetForDate(date) {
+  if (programPhaseForDate(date) === "recomp") {
+    return {
+      phase: "recomp",
+      calories: maintenanceCalories(),
+      protein: PROGRAM.recompProtein,
+      label: "Maintenance + recomp"
+    };
+  }
+
+  const dayIndex = clamp(daysBetween(date, parseLocalDate(PROGRAM.startDate)), 0, 61);
+  const cutWeekIndex = clamp(Math.floor(dayIndex / 7), 0, PROGRAM.cutCalorieSteps.length - 1);
+  return {
+    phase: "cut",
+    calories: PROGRAM.cutCalorieSteps[cutWeekIndex],
+    protein: PROGRAM.cutProtein,
+    label: "Aggressive cut"
+  };
+}
+
+function applyPhasePlanTargets() {
+  BASE_MEAL_PLAN.forEach((sourceDay, index) => {
+    const target = phaseTargetForDate(parseLocalDate(sourceDay.date));
+    const routineCalories = 300;
+    const desiredMealCalories = Math.max(900, target.calories - routineCalories);
+    const sourceMealCalories = sourceDay.meals.reduce((sum, meal) => sum + Number(meal.calories || 0), 0);
+    const scale = sourceMealCalories > 0 ? desiredMealCalories / sourceMealCalories : 1;
+    const scaledMeals = sourceDay.meals.map(meal => ({
+      ...meal,
+      portion: Math.round(Number(meal.portion || 1) * scale * 1000) / 1000,
+      calories: Math.round(Number(meal.calories || 0) * scale),
+      protein: roundMacro(Number(meal.protein || 0) * scale),
+      carbs: roundMacro(Number(meal.carbs || 0) * scale),
+      fat: roundMacro(Number(meal.fat || 0) * scale),
+      fiber: roundMacro(Number(meal.fiber || 0) * scale)
+    }));
+
+    MEAL_PLAN[index] = {
+      ...sourceDay,
+      targetCalories: target.calories,
+      targetProtein: target.protein,
+      phase: target.phase,
+      meals: scaledMeals,
+      totals: calculateMealTotals(scaledMeals)
+    };
+  });
+}
+
+function bindMaintenanceCalories() {
+  const input = document.getElementById("maintenanceCaloriesInput");
+  const button = document.getElementById("saveMaintenanceCalories");
+  const message = document.getElementById("maintenanceCaloriesMessage");
+  input.value = maintenanceCalories();
+
+  button.addEventListener("click", () => {
+    const value = Number(input.value);
+    if (!Number.isFinite(value) || value < 1800 || value > 3000) {
+      message.textContent = "Choose a starting estimate from 1,800 to 3,000 calories.";
+      return;
+    }
+    localStorage.setItem(MAINTENANCE_CALORIES_STORAGE_KEY, String(Math.round(value / 50) * 50));
+    input.value = maintenanceCalories();
+    message.textContent = `Recomp starting target saved at ${maintenanceCalories().toLocaleString()} calories.`;
+    applyPhasePlanTargets();
+    refreshMealViews();
+    renderProgress();
+  });
+}
+
+function renderPhaseCard(date) {
+  const phase = phaseTargetForDate(date);
+  const isCut = phase.phase === "cut";
+  const badge = document.getElementById("phaseBadge");
+  badge.textContent = isCut ? "Phase 1" : "Phase 2";
+  badge.classList.toggle("cut", isCut);
+  badge.classList.toggle("recomp", !isCut);
+  document.getElementById("phaseTitle").textContent = phase.label;
+  document.getElementById("phaseDates").textContent = isCut
+    ? "July 11–September 10"
+    : "September 11–October 8";
+  document.getElementById("phaseGoal").textContent = isCut ? "178 → 155 lb" : "Hold 153–157 lb";
+  document.getElementById("phaseProtein").textContent = `${phase.protein}g`;
+  document.getElementById("phaseCalories").textContent = `${phase.calories.toLocaleString()} / day`;
+  document.getElementById("phaseDescription").textContent = isCut
+    ? "The requested target is 178 to 155 lb by September 10. The app treats this as an aggressive trend line, not a guaranteed result."
+    : "Calories return to your maintenance estimate. The scale goal becomes stable weight while resistance training and adequate protein support recomposition.";
+  document.getElementById("phaseSafetyNote").textContent = isCut
+    ? "This pace is faster than standard weight-loss guidance. Prioritize recovery and speak with a clinician or registered dietitian before sustaining a large deficit."
+    : "Use your 7-day weight average and gym performance to calibrate maintenance. Change calories in small steps instead of chasing day-to-day scale noise.";
+}
+
 function targetWeightForDate(date) {
-  const dayIndex = clamp(daysBetween(date, parseLocalDate(PROGRAM.startDate)), 0, PROGRAM.totalDays - 1);
+  const start = parseLocalDate(PROGRAM.startDate);
+  const cutEnd = parseLocalDate(PROGRAM.cutEndDate);
+  if (localDay(date) >= cutEnd) return PROGRAM.goalWeight;
+  const elapsed = clamp(daysBetween(date, start), 0, daysBetween(cutEnd, start));
+  const cutDays = daysBetween(cutEnd, start);
   return PROGRAM.startWeight -
-    ((PROGRAM.startWeight - PROGRAM.goalWeight) * dayIndex / (PROGRAM.totalDays - 1));
+    ((PROGRAM.startWeight - PROGRAM.goalWeight) * elapsed / cutDays);
 }
 
 function formatDate(iso, options = { month: "short", day: "numeric", year: "numeric" }) {
@@ -878,12 +980,13 @@ function renderProgramDay() {
   const elapsed = daysBetween(today, parseLocalDate(PROGRAM.startDate));
   const dayIndex = clamp(elapsed, 0, PROGRAM.totalDays - 1);
   const displayDay = dayIndex + 1;
-  const weekIndex = clamp(Math.floor(dayIndex / 7), 0, PROGRAM.weeklyTargets.length - 1);
-  const target = PROGRAM.weeklyTargets[weekIndex];
+  const weekIndex = clamp(Math.floor(dayIndex / 7), 0, 12);
+  const target = phaseTargetForDate(today);
   const completion = Math.round((displayDay / PROGRAM.totalDays) * 100);
   const targetCenter = targetWeightForDate(today);
-  const targetLow = Math.max(PROGRAM.goalWeight, targetCenter - 0.3);
-  const targetHigh = targetCenter + 0.3;
+  const isRecomp = target.phase === "recomp";
+  const targetLow = isRecomp ? 153 : Math.max(PROGRAM.goalWeight, targetCenter - 0.5);
+  const targetHigh = isRecomp ? 157 : targetCenter + 0.5;
 
   document.getElementById("dayLabel").textContent = `Day ${displayDay} of ${PROGRAM.totalDays}`;
   document.getElementById("weekLabel").textContent = `Week ${weekIndex + 1}`;
@@ -891,6 +994,8 @@ function renderProgramDay() {
   document.getElementById("progressPercent").textContent = `${completion}% complete`;
   document.getElementById("daysRemaining").textContent = `${PROGRAM.totalDays - displayDay} days remaining`;
   document.getElementById("targetWeight").textContent = `${targetLow.toFixed(1)}–${targetHigh.toFixed(1)} lb`;
+  document.getElementById("targetWeightNote").textContent = isRecomp ? "Maintenance range for recomposition" : "Aggressive goal line, not a guarantee";
+  renderPhaseCard(today);
   document.getElementById("calorieTarget").textContent = target.calories.toLocaleString();
   document.getElementById("proteinTarget").textContent = `${target.protein}g protein`;
   document.getElementById("proteinTargetSmall").textContent = `${target.protein}g protein`;
@@ -1254,6 +1359,8 @@ function registerServiceWorker() {
   }
 }
 
+applyPhasePlanTargets();
+bindMaintenanceCalories();
 bindShakeFlavor();
 renderProgramDay();
 renderHabits();

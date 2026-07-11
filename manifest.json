@@ -1,11 +1,11 @@
 {
-  "name": "Mediterranean 90-Day Cut",
-  "short_name": "Meal Plan",
+  "name": "Mediterranean Cut + Recomp",
+  "short_name": "Cut + Recomp",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f3f0e8",
   "theme_color": "#173a2c",
-  "description": "A 90-day Mediterranean meal plan with 50 recipes and weight progress tracking.",
+  "description": "A two-phase Mediterranean aggressive-cut and maintenance/recomposition planner.",
   "icons": [
     {
       "src": "icon.svg",

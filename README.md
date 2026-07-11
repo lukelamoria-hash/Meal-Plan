@@ -1,25 +1,39 @@
-# Mediterranean 90-Day Cut App — Version 6
+# Mediterranean Cut + Recomp App — Version 7
 
-This update adds Luke's fixed daily routine and work schedule.
+This version adds two program phases:
 
-## Added
+## Phase 1 — Aggressive cut
+- July 11 through September 10, 2026
+- Requested trend: 178 lb to 155 lb
+- Calories taper from 2,000 to 1,650 per day
+- 180 g daily protein target
+- Both 150-calorie Fairlife shakes remain included in the daily calorie total
+- The target line reaches 155 lb on September 10
 
-- Two Fairlife Nutrition Plan shakes every day
-- 150 calories and 30g protein per bottle
-- Chocolate/vanilla selector so carbohydrate and fiber values match the bottle
-- Plain black coffee paired with the first shake
-- Friday, Saturday, Sunday, and Monday work schedule: 3:00–9:00 AM
-- Workday meal times: 2:30 AM coffee/shake, 6:00 AM shake, 9:30 AM breakfast, 1:30 PM lunch, 4:30 PM snack, 7:30 PM dinner
-- Off-day timing: 7:00 AM coffee/shake, 9:00 AM breakfast, 1:00 PM lunch, 3:00 PM shake, 5:00 PM snack, 7:30 PM dinner
-- The 300 shake calories are included in the existing daily calorie target
-- Recipe portions were reduced proportionally so the plan does not add 300 calories on top
-- The old Protein Shake & Orange schedule entries were replaced so the plan does not accidentally prescribe a third shake
-- Grocery list includes 14 Fairlife bottles for full weeks and 12 for the six-day final week
+The requested loss rate is aggressive. The app labels it as a requested trend line, not a guaranteed or medically supervised outcome.
 
-## Storage
+## Phase 2 — Maintenance and recomposition
+- September 11 through October 8, 2026
+- Default starting estimate: 2,200 calories per day
+- Editable from the dashboard in 50-calorie steps
+- 165 g daily protein target
+- Goal range: approximately 153–157 lb while improving strength and body composition
+- The 13-week plan automatically rescales scheduled recipe portions when the maintenance setting changes
 
-Shake flavor, meal swaps, habits, and weigh-ins are saved locally in the browser.
+## Existing features retained
+- Two daily Fairlife Nutrition Plan shakes plus black coffee
+- Friday, Saturday, Sunday, and Monday work schedule from 3:00–9:00 AM
+- 50-recipe library with ingredient-based macros
+- 90-day / 13-week meal schedule
+- Meal swaps up to 14 days ahead
+- One calorie-capped flex meal each week
+- Weight tracking and actual-versus-target graph
+- Offline/installable PWA support
 
 ## Deploy
+1. Unzip the package.
+2. Upload every file to the root of the GitHub repository.
+3. Allow GitHub to replace files with matching names.
+4. Commit the changes. Vercel should deploy automatically.
 
-Upload all files to the root of the GitHub repository and commit. Vercel will redeploy automatically.
+Weight entries, swaps, habits, shake flavor, and the maintenance-calorie setting are stored locally in the browser and do not yet synchronize across devices.

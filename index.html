@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#173a2c" />
   <meta name="description" content="A personal 90-day Mediterranean meal plan and progress tracker." />
-  <title>Mediterranean 90-Day Cut</title>
+  <title>Mediterranean Cut + Recomp</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
@@ -15,8 +15,8 @@
     <a class="brand" href="#" data-tab-link="dashboard" aria-label="Open dashboard">
       <span class="brand-mark">M</span>
       <span>
-        <span class="brand-title">Mediterranean Cut</span>
-        <span class="brand-subtitle">90-day plan</span>
+        <span class="brand-title">Mediterranean Cut + Recomp</span>
+        <span class="brand-subtitle">Two-phase 90-day plan</span>
       </span>
     </a>
 
@@ -67,6 +67,36 @@
         </div>
       </section>
 
+
+      <section class="card phase-card">
+        <div class="phase-main">
+          <div class="phase-title-row">
+            <span id="phaseBadge" class="phase-badge cut">Phase 1</span>
+            <span id="phaseDates" class="muted">July 11–September 10</span>
+          </div>
+          <h2 id="phaseTitle">Aggressive cut</h2>
+          <p id="phaseDescription" class="muted">The requested target is 178 to 155 lb by September 10. The app treats this as an aggressive trend line, not a guaranteed result.</p>
+          <div id="phaseSafetyNote" class="phase-safety-note">This pace is faster than standard weight-loss guidance. Prioritize recovery and speak with a clinician or registered dietitian before sustaining a large deficit.</div>
+        </div>
+        <div class="phase-metrics">
+          <div><span>Scale goal</span><strong id="phaseGoal">178 → 155 lb</strong></div>
+          <div><span>Daily protein</span><strong id="phaseProtein">180g</strong></div>
+          <div><span>Phase calories</span><strong id="phaseCalories">—</strong></div>
+        </div>
+        <div class="maintenance-calibration">
+          <div>
+            <span class="calibration-label">Recomp starting estimate</span>
+            <strong>Maintenance calories</strong>
+            <small>Used automatically beginning September 11. Adjust from scale trend, performance, and recovery.</small>
+          </div>
+          <div class="maintenance-input-row">
+            <input id="maintenanceCaloriesInput" type="number" min="1800" max="3000" step="50" value="2200" aria-label="Maintenance calorie target" />
+            <button id="saveMaintenanceCalories" class="button primary">Save</button>
+          </div>
+          <p id="maintenanceCaloriesMessage" class="form-message" aria-live="polite"></p>
+        </div>
+      </section>
+
       <section class="stats-grid">
         <article class="card stat">
           <span>Starting weight</span>
@@ -79,9 +109,9 @@
           <small id="dashboardLatestDate">Log your first weigh-in</small>
         </article>
         <article class="card stat">
-          <span>Today's target range</span>
+          <span>Requested trend range</span>
           <strong id="targetWeight">—</strong>
-          <small>Trend guide, not a pass/fail score</small>
+          <small id="targetWeightNote">Aggressive goal line, not a guarantee</small>
         </article>
         <article class="card stat">
           <span>Today's calories</span>
@@ -176,9 +206,25 @@
         <div>
           <p class="eyebrow">90-day schedule</p>
           <h1>Weeks 1–13</h1>
-          <p class="muted">Every day includes your fixed Fairlife routine, work-adjusted meal times, calculated nutrition, and live totals. Swap recipe meals from today through 14 days ahead; Week 13 contains the final six days of the 90-day plan.</p>
+          <p class="muted">Every day includes your fixed Fairlife routine, work-adjusted meal times, calculated nutrition, live totals, and the active cut or recomp phase. Swap recipe meals from today through 14 days ahead; Week 13 contains the final six days of the 90-day plan.</p>
         </div>
       </div>
+
+
+      <section class="phase-roadmap">
+        <article class="card roadmap-phase cut-phase">
+          <span class="phase-badge cut">Phase 1</span>
+          <h2>Aggressive cut</h2>
+          <p class="roadmap-dates">July 11–September 10 · Days 1–62</p>
+          <p>Calories taper from 2,000 to 1,650 per day, including both Fairlife shakes. The requested weight line reaches 155 lb on September 10.</p>
+        </article>
+        <article class="card roadmap-phase recomp-phase">
+          <span class="phase-badge recomp">Phase 2</span>
+          <h2>Maintenance + recomp</h2>
+          <p class="roadmap-dates">September 11–October 8 · Days 63–90</p>
+          <p>Calories rise to your editable maintenance estimate. The goal becomes holding roughly 153–157 lb while improving strength and body composition.</p>
+        </article>
+      </section>
 
       <section class="card plan-tools">
         <div id="weekSelector" class="week-selector" aria-label="Select a week"></div>
