@@ -70,6 +70,13 @@ const CATEGORY_ICONS = {
 const MEAL_SWAP_STORAGE_KEY = "med-cut-meal-swaps-v1";
 const FLEX_MEAL_CAPS = [750, 750, 700, 700, 650, 650, 600, 600, 550, 550, 500, 500, 500];
 const SWAP_WINDOW_DAYS = 14;
+const SHAKE_FLAVOR_STORAGE_KEY = "med-cut-fairlife-flavor-v1";
+const FAIRLIFE_NUTRITION = {
+  chocolate: { label: "Chocolate", calories: 150, protein: 30, carbs: 4, fat: 2.5, fiber: 1 },
+  vanilla: { label: "Vanilla", calories: 150, protein: 30, carbs: 3, fat: 2.5, fiber: 0 }
+};
+const WORK_DAYS = new Set([0, 4, 5, 6]); // Sunday, Monday, Friday, Saturday
+const WORK_SHIFT = "3:00–9:00 AM";
 let activeSwapContext = null;
 
 
@@ -214,7 +221,67 @@ let activePlanWeek = 1;
 
 function portionLabel(portion) {
   const labels = { "0.75": "¾ serving", "1": "1 serving", "1.25": "1¼ servings", "1.5": "1½ servings" };
-  return labels[String(portion)] || `${portion} servings`;
+  if (labels[String(portion)]) return labels[String(portion)];
+  const formatted = Number(portion).toFixed(2).replace(/\.?0+$/, "");
+  return `${formatted} ${Number(portion) === 1 ? "serving" : "servings"}`;
+}
+
+function selectedShakeFlavor() {
+  const saved = localStorage.getItem(SHAKE_FLAVOR_STORAGE_KEY);
+  return FAIRLIFE_NUTRITION[saved] ? saved : "chocolate";
+}
+
+function fairlifeNutrition() {
+  return FAIRLIFE_NUTRITION[selectedShakeFlavor()];
+}
+
+function isWorkday(isoDate) {
+  return WORK_DAYS.has(parseLocalDate(isoDate).getDay());
+}
+
+function routineForDay(day) {
+  const shake = fairlifeNutrition();
+  const workday = isWorkday(day.date);
+  return [
+    {
+      time: workday ? "2:30 AM" : "7:00 AM",
+      category: "Routine",
+      name: `Black Coffee + Fairlife ${shake.label} Shake #1`,
+      portion: 1,
+      calories: shake.calories,
+      protein: shake.protein,
+      carbs: shake.carbs,
+      fat: shake.fat,
+      fiber: shake.fiber,
+      routineType: "coffee-shake"
+    },
+    {
+      time: workday ? "6:00 AM" : "3:00 PM",
+      category: "Routine",
+      name: `Fairlife ${shake.label} Shake #2`,
+      portion: 1,
+      calories: shake.calories,
+      protein: shake.protein,
+      carbs: shake.carbs,
+      fat: shake.fat,
+      fiber: shake.fiber,
+      routineType: "shake"
+    }
+  ];
+}
+
+function routineItemMarkup(item, compact = false) {
+  return `
+    <div class="routine-item ${compact ? "compact" : ""}">
+      <div class="routine-time">${item.time}</div>
+      <div class="routine-main">
+        <strong>${item.name}</strong>
+        <span>${item.routineType === "coffee-shake" ? "Plain black coffee adds 0 calories" : "1 bottle (340 mL)"}</span>
+      </div>
+      <div class="routine-macros">${item.calories} cal · ${item.protein}g protein · ${item.carbs}g carbs · ${item.fat}g fat</div>
+      <span class="locked-badge">Fixed</span>
+    </div>
+  `;
 }
 
 function currentProgramDayIndex() {
@@ -315,9 +382,9 @@ function getEffectiveMeal(day, slotIndex) {
   return { ...base, isSubstitution: false, swapType: null };
 }
 
-function calculateMealTotals(meals) {
+function calculateMealTotals(items) {
   return ["calories", "protein", "carbs", "fat", "fiber"].reduce((totals, key) => {
-    const value = meals.reduce((sum, meal) => sum + Number(meal[key] || 0), 0);
+    const value = items.reduce((sum, item) => sum + Number(item[key] || 0), 0);
     totals[key] = key === "calories" ? Math.round(value) : roundMacro(value);
     return totals;
   }, {});
@@ -325,7 +392,8 @@ function calculateMealTotals(meals) {
 
 function getEffectiveDay(day) {
   const meals = day.meals.map((_, slotIndex) => getEffectiveMeal(day, slotIndex));
-  return { ...day, meals, totals: calculateMealTotals(meals) };
+  const routine = routineForDay(day);
+  return { ...day, meals, routine, totals: calculateMealTotals([...routine, ...meals]) };
 }
 
 function getFlexSwapForWeek(week, excludingKey = null) {
@@ -596,7 +664,7 @@ function renderPlanWeek(weekNumber) {
     <div class="week-summary-main">
       <p class="eyebrow">Week ${activePlanWeek}</p>
       <h2>${formatDate(first.date, { month: "long", day: "numeric" })}–${formatDate(last.date, { month: "long", day: "numeric", year: "numeric" })}</h2>
-      <p class="muted">${days.length} planned days · ${first.targetCalories.toLocaleString()} calorie target</p>
+      <p class="muted">${days.length} planned days · ${first.targetCalories.toLocaleString()} calorie target · two Fairlife shakes included daily</p>
     </div>
     <div class="week-summary-stat"><span>Average plan</span><strong>${Math.round(averages.calories).toLocaleString()} cal</strong></div>
     <div class="week-summary-stat"><span>Average protein</span><strong>${averages.protein.toFixed(0)}g</strong></div>
@@ -637,6 +705,11 @@ function renderPlanWeek(weekNumber) {
           </div>
           <div class="day-target"><strong>${day.targetCalories.toLocaleString()} cal target</strong><span>${day.targetProtein}g protein target</span></div>
         </header>
+        <div class="plan-shift-row">
+          <span class="shift-badge ${isWorkday(day.date) ? "work" : "off"}">${isWorkday(day.date) ? `Work ${WORK_SHIFT}` : "Off work"}</span>
+          <span>Fixed routine is included in daily totals</span>
+        </div>
+        <div class="plan-routine">${day.routine.map(item => routineItemMarkup(item, true)).join("")}</div>
         <div class="plan-meals">${day.meals.map((meal, slotIndex) => planMealMarkup(day, meal, slotIndex)).join("")}</div>
         <footer class="plan-day-total">
           <div class="plan-total-label"><strong>Daily total</strong><span>${differenceLabel}</span></div>
@@ -655,6 +728,15 @@ function renderPlanWeek(weekNumber) {
   });
   document.querySelectorAll("#weekDays [data-swap-date]").forEach(button => {
     button.addEventListener("click", () => openSwapDialog(button.dataset.swapDate, Number(button.dataset.swapSlot)));
+  });
+}
+
+function bindShakeFlavor() {
+  const select = document.getElementById("shakeFlavorSelect");
+  select.value = selectedShakeFlavor();
+  select.addEventListener("change", () => {
+    localStorage.setItem(SHAKE_FLAVOR_STORAGE_KEY, select.value);
+    refreshMealViews();
   });
 }
 
@@ -815,7 +897,13 @@ function renderProgramDay() {
   document.getElementById("groceryWeekHeading").textContent = `Week ${weekIndex + 1} grocery list`;
 
   const planDay = MEAL_PLAN[dayIndex];
+  const effectiveDay = getEffectiveDay(planDay);
   const meals = getDailyRecipes(dayIndex);
+  const routine = effectiveDay.routine;
+  document.getElementById("todayShiftStatus").textContent = isWorkday(planDay.date)
+    ? `Workday · shift ${WORK_SHIFT} · breakfast is scheduled after work`
+    : "Off work · standard meal timing";
+  document.getElementById("routineList").innerHTML = routine.map(item => routineItemMarkup(item)).join("");
   const mealMarkup = meals.map((meal, slotIndex) => {
     const nameControl = meal.recipeId
       ? `<button class="meal-name-button" data-open-recipe="${meal.recipeId}">${meal.name}<span class="dashboard-portion">${meal.swapType === "flex" ? "weekly flex meal" : portionLabel(meal.portion)}</span></button>`
@@ -841,7 +929,15 @@ function renderProgramDay() {
     button.addEventListener("click", () => openSwapDialog(button.dataset.swapDate, Number(button.dataset.swapSlot)));
   });
 
-  document.getElementById("groceryList").innerHTML = Object.entries(groceries)
+  const daysInWeek = MEAL_PLAN.filter(day => day.week === weekIndex + 1).length;
+  const weeklyGroceries = {
+    "Daily routine": [
+      `Fairlife Nutrition Plan shakes – ${daysInWeek * 2} bottles`,
+      "Black coffee – enough for the week"
+    ],
+    ...groceries
+  };
+  document.getElementById("groceryList").innerHTML = Object.entries(weeklyGroceries)
     .map(([group, items]) => `
       <div class="grocery-group">
         <h3>${group}</h3>
@@ -1158,6 +1254,7 @@ function registerServiceWorker() {
   }
 }
 
+bindShakeFlavor();
 renderProgramDay();
 renderHabits();
 bindRecipeLibrary();

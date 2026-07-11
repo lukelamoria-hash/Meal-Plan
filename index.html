@@ -90,6 +90,25 @@
         </article>
       </section>
 
+      <section class="card daily-routine-card">
+        <div class="section-head routine-heading">
+          <div>
+            <p class="eyebrow">Fixed daily routine</p>
+            <h2>Black coffee + two Fairlife shakes</h2>
+            <p id="todayShiftStatus" class="muted"></p>
+          </div>
+          <label class="shake-flavor-control" for="shakeFlavorSelect">
+            <span>Shake flavor</span>
+            <select id="shakeFlavorSelect">
+              <option value="chocolate">Chocolate</option>
+              <option value="vanilla">Vanilla</option>
+            </select>
+          </label>
+        </div>
+        <div id="routineList" class="routine-list"></div>
+        <p class="routine-note">The two bottles contribute 300 calories and 60g protein per day and are already included in the daily target.</p>
+      </section>
+
       <section class="dashboard-grid">
         <article class="card">
           <div class="section-head">
@@ -157,7 +176,7 @@
         <div>
           <p class="eyebrow">90-day schedule</p>
           <h1>Weeks 1–13</h1>
-          <p class="muted">Every day includes meal times, calculated nutrition, and live totals. Swap meals from today through 14 days ahead; Week 13 contains the final six days of the 90-day plan.</p>
+          <p class="muted">Every day includes your fixed Fairlife routine, work-adjusted meal times, calculated nutrition, and live totals. Swap recipe meals from today through 14 days ahead; Week 13 contains the final six days of the 90-day plan.</p>
         </div>
       </div>
 
@@ -165,7 +184,10 @@
         <div id="weekSelector" class="week-selector" aria-label="Select a week"></div>
         <div class="plan-note-grid">
           <div class="plan-source-note">
-            <strong>Nutrition calculation:</strong> recipe macros are calculated from listed ingredient weights using USDA FoodData Central reference values. Packaged foods use a fixed reference-label value, so match the listed serving or substitute your product label.
+            <strong>Daily routine:</strong> Friday–Monday work shift is 3:00–9:00 AM. Two Fairlife Nutrition Plan bottles and plain black coffee are fixed daily entries; the bottles are included in every calorie and macro total.
+          </div>
+          <div class="plan-source-note">
+            <strong>Nutrition calculation:</strong> recipe macros use listed ingredient weights and reference nutrition. Choose chocolate or vanilla above so the Fairlife carbohydrate and fiber values match your bottle.
           </div>
           <div id="swapWindowNote" class="plan-source-note swap-window-note"></div>
         </div>

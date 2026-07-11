@@ -1,33 +1,25 @@
-# Mediterranean 90-Day Cut App — Version 5
+# Mediterranean 90-Day Cut App — Version 6
 
-This update adds controlled meal substitutions and a weekly cheat/flex meal.
+This update adds Luke's fixed daily routine and work schedule.
 
-## New features
+## Added
 
-- Swap any scheduled meal from **today through 14 days ahead**
-- Past meals and dates beyond the 14-day window are locked
-- Regular swaps stay in the same category (breakfast, lunch, dinner, or snack)
-- Alternatives used in the selected week appear first
-- Choose ¾, 1, 1¼, or 1½ servings
-- Swapped recipe nutrition is recalculated from the recipe's ingredient-based macros
-- Daily and weekly totals update immediately
-- One weekly cheat/flex meal card for every week
-- Weekly calorie caps: 750, 750, 700, 700, 650, 650, 600, 600, 550, 550, 500, 500, and 500 calories
-- A flex meal can replace any unlocked scheduled meal once per week
-- The app requires the actual calories, protein, carbs, fat, and fiber from a label before saving a flex meal
-- Restore the originally scheduled meal while the date remains in the editable window
-- All swaps are saved locally and work offline
+- Two Fairlife Nutrition Plan shakes every day
+- 150 calories and 30g protein per bottle
+- Chocolate/vanilla selector so carbohydrate and fiber values match the bottle
+- Plain black coffee paired with the first shake
+- Friday, Saturday, Sunday, and Monday work schedule: 3:00–9:00 AM
+- Workday meal times: 2:30 AM coffee/shake, 6:00 AM shake, 9:30 AM breakfast, 1:30 PM lunch, 4:30 PM snack, 7:30 PM dinner
+- Off-day timing: 7:00 AM coffee/shake, 9:00 AM breakfast, 1:00 PM lunch, 3:00 PM shake, 5:00 PM snack, 7:30 PM dinner
+- The 300 shake calories are included in the existing daily calorie target
+- Recipe portions were reduced proportionally so the plan does not add 300 calories on top
+- The old Protein Shake & Orange schedule entries were replaced so the plan does not accidentally prescribe a third shake
+- Grocery list includes 14 Fairlife bottles for full weeks and 12 for the six-day final week
+
+## Storage
+
+Shake flavor, meal swaps, habits, and weigh-ins are saved locally in the browser.
 
 ## Deploy
 
-1. Unzip the package.
-2. Upload every file to the root of the GitHub repository.
-3. Allow GitHub to replace files with matching names.
-4. Commit the changes.
-5. Vercel should redeploy automatically.
-
-No build command or environment variables are required.
-
-## Storage note
-
-Meal swaps, weigh-ins, and habits are stored in that browser's `localStorage`. They do not yet sync between devices.
+Upload all files to the root of the GitHub repository and commit. Vercel will redeploy automatically.

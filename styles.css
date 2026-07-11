@@ -521,3 +521,34 @@ body.modal-open{overflow:hidden}
   .swap-modal{padding:19px;border-radius:19px;max-height:calc(100vh - 12px)}
   .swap-modal-footer{align-items:flex-start;flex-direction:column}
 }
+
+
+/* Version 6: Fairlife routine and work schedule */
+.daily-routine-card{margin-bottom:14px;background:linear-gradient(135deg,#fffdf8 0%,#eef5ef 100%)}
+.routine-heading{align-items:flex-start}
+.shake-flavor-control{display:grid;gap:6px;min-width:190px;color:var(--muted);font-size:.78rem;font-weight:800}
+.shake-flavor-control select,.swap-field select{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:white;color:var(--ink);font:inherit}
+.routine-list,.plan-routine{display:grid;gap:9px}
+.routine-item{display:grid;grid-template-columns:86px 1fr auto auto;align-items:center;gap:14px;padding:13px 0;border-top:1px solid var(--line)}
+.routine-item:first-child{border-top:0}
+.routine-time{font-weight:850;color:var(--green-2);font-size:.84rem}
+.routine-main{display:grid;gap:2px}
+.routine-main span{color:var(--muted);font-size:.76rem}
+.routine-macros{color:var(--muted);font-size:.8rem;text-align:right}
+.locked-badge{padding:5px 9px;border-radius:999px;background:#e7ece8;color:var(--green);font-size:.68rem;font-weight:850;text-transform:uppercase;letter-spacing:.06em}
+.routine-note{margin:12px 0 0;color:var(--muted);font-size:.78rem}
+.plan-shift-row{display:flex;align-items:center;gap:10px;padding:12px 0 5px;color:var(--muted);font-size:.78rem}
+.shift-badge{display:inline-flex;padding:6px 9px;border-radius:999px;font-weight:850}
+.shift-badge.work{background:#e5efe8;color:var(--green)}
+.shift-badge.off{background:#f0eee8;color:#6b6253}
+.plan-routine{margin-bottom:10px;padding:0 14px;border-radius:15px;background:#f4f7f3}
+.plan-routine .routine-item{grid-template-columns:82px 1fr auto auto}
+.plan-routine .routine-main strong{font-size:.86rem}
+.plan-routine .routine-macros{font-size:.75rem}
+@media(max-width:760px){
+  .routine-heading{display:grid}
+  .shake-flavor-control{min-width:0;width:100%}
+  .routine-item,.plan-routine .routine-item{grid-template-columns:72px 1fr auto}
+  .routine-macros{grid-column:2;text-align:left}
+  .locked-badge{grid-row:1;grid-column:3}
+}
